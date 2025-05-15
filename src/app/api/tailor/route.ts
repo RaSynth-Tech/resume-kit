@@ -74,18 +74,24 @@ export async function POST(request: NextRequest) {
     const { data: { publicUrl } } = supabase.storage
       .from('resumes')
       .getPublicUrl(filePath);
-
     // Store in database
     const tailoringRequest: TailoringRequest = {
-      email,
+      id: crypto.randomUUID(),
+      user_id: email,
       job_description: jobDescription,
       resume_path: filePath,
       created_at: new Date().toISOString()
     };
 
     const { error: dbError } = await supabase
-      .from('tailoring_requests')
-      .insert([tailoringRequest]);
+      .from('tailoring_data')
+      .insert([{
+        id: crypto.randomUUID(),
+        user_id: email,
+        job_description: jobDescription,
+        resume_path: filePath,
+        created_at: new Date().toISOString()
+      }]);
 
     if (dbError) {
       // If database insert fails, delete the uploaded file
