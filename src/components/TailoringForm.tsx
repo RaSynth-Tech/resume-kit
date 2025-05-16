@@ -8,7 +8,6 @@ interface TailoringFormProps {
 
 export default function TailoringForm({ onSubmit, isLoading = false }: TailoringFormProps) {
   const [formData, setFormData] = useState<TailoringFormData>({
-    email: '',
     jobDescription: '',
     resumeFile: null
   });
@@ -18,11 +17,6 @@ export default function TailoringForm({ onSubmit, isLoading = false }: Tailoring
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
     
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
     
     if (!formData.jobDescription) {
       newErrors.jobDescription = 'Job description is required';
@@ -42,7 +36,6 @@ export default function TailoringForm({ onSubmit, isLoading = false }: Tailoring
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('email', formData.email);
       formDataToSend.append('jobDescription', formData.jobDescription);
       if (formData.resumeFile) {
         formDataToSend.append('resumeFile', formData.resumeFile);
@@ -93,25 +86,6 @@ export default function TailoringForm({ onSubmit, isLoading = false }: Tailoring
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-          Email Address
-        </label>
-        <input
-          type="email"
-          id="email"
-          className={`input-field ${errors.email ? 'border-red-500' : ''}`}
-          value={formData.email}
-          onChange={(e) => {
-            setFormData({ ...formData, email: e.target.value });
-            setErrors({ ...errors, email: undefined });
-          }}
-          placeholder="Enter your email address"
-        />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-        )}
-      </div>
 
       <div>
         <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700 mb-2">

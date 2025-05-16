@@ -1,27 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { SessionInfo } from '@/types';
-import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
   try {
-
-    const cookieStore = cookies();
-    const allCookies = cookieStore.getAll();
-
     const supabase = getSupabaseServerClient();
 
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
+    // Securely fetch the user using Supabase Auth server validation
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    if (error) {
-      console.error('Supabase session error:', error);
-      throw new Error('Failed to fetch session');
+    if (userError) {
+      console.error('Supabase user fetch error:', userError);
+      throw new Error('Failed to fetch user');
     }
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({
         success: true,
         data: {
@@ -31,11 +24,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Fetch user profile
+    // Fetch user profile from 'users' table
     const { data: profile, error: profileError } = await supabase
       .from('users')
       .select('*')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     if (profileError) {
@@ -44,16 +37,17 @@ export async function GET(request: NextRequest) {
 
     const response: SessionInfo = {
       user: {
-        id: session.user.id,
-        email: session.user.email!,
+        id: user.id,
+        email: user.email!,
         name: profile?.name ?? undefined,
         avatar_url: profile?.avatar_url ?? undefined,
-        created_at: session.user.created_at,
+        created_at: user.created_at,
       },
       isAuthenticated: true,
     };
 
     return NextResponse.json({ success: true, data: response });
+
   } catch (err) {
     console.error('Session fetch error:', err);
     return NextResponse.json(

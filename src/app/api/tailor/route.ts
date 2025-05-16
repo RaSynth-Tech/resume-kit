@@ -1,28 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { TailoringRequest } from '@/types';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = getSupabaseServerClient();
+    
+    // Get user from session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
     const formData = await request.formData();
-    const email = formData.get('email') as string;
     const jobDescription = formData.get('jobDescription') as string;
     const resumeFile = formData.get('resumeFile') as File;
 
     // Validate inputs
-    if (!email || !jobDescription || !resumeFile) {
+    if (!jobDescription || !resumeFile) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Get user profile from users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id, email')
+      .eq('id', session.user.id)
+      .single();
+
+    if (userError || !userData) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
+        { error: 'User profile not found' },
+        { status: 404 }
       );
     }
 
@@ -47,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Generate unique file name
     const fileExt = resumeFile.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `${email}/${fileName}`;
+    const filePath = `${userData.email}/${fileName}`;
 
     // Convert File to ArrayBuffer for Supabase upload
     const arrayBuffer = await resumeFile.arrayBuffer();
@@ -74,20 +91,12 @@ export async function POST(request: NextRequest) {
     const { data: { publicUrl } } = supabase.storage
       .from('resumes')
       .getPublicUrl(filePath);
-    // Store in database
-    const tailoringRequest: TailoringRequest = {
-      id: crypto.randomUUID(),
-      user_id: email,
-      job_description: jobDescription,
-      resume_path: filePath,
-      created_at: new Date().toISOString()
-    };
-
+    // Store in database with proper user_id mapping
     const { error: dbError } = await supabase
       .from('tailoring_data')
       .insert([{
         id: crypto.randomUUID(),
-        user_id: email,
+        user_id: session.user.id, // Use the ID from the session
         job_description: jobDescription,
         resume_path: filePath,
         created_at: new Date().toISOString()
@@ -109,7 +118,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        email,
+        email: userData.email,
         resumePath: filePath,
         publicUrl
       }

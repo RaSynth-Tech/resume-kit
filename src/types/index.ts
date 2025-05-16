@@ -1,5 +1,4 @@
 export interface TailoringFormData {
-  email: string;
   jobDescription: string;
   resumeFile: File | null;
 }
