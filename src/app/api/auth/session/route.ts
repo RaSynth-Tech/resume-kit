@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { SessionInfo } from '@/types';
+import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = getSupabaseServerClient();
-    const { data: { session }, error } = await supabase.auth.getSession();
 
-    if (error) throw error;
+    const cookieStore = cookies();
+    const allCookies = cookieStore.getAll();
+
+    const supabase = getSupabaseServerClient();
+
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error('Supabase session error:', error);
+      throw new Error('Failed to fetch session');
+    }
 
     if (!session) {
       return NextResponse.json({
@@ -19,12 +31,16 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Get user profile
-    const { data: profile } = await supabase
+    // Fetch user profile
+    const { data: profile, error: profileError } = await supabase
       .from('users')
       .select('*')
       .eq('id', session.user.id)
       .single();
+
+    if (profileError) {
+      console.warn('User profile not found:', profileError);
+    }
 
     const response: SessionInfo = {
       user: {
@@ -38,11 +54,11 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json({ success: true, data: response });
-  } catch (error) {
-    console.error('Session error:', error);
+  } catch (err) {
+    console.error('Session fetch error:', err);
     return NextResponse.json(
       { success: false, error: 'Failed to get session' },
       { status: 500 }
     );
   }
-} 
+}

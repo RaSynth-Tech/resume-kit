@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { AuthResponse } from '@/types';
 
 export async function POST(request: NextRequest) {
@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    const supabase = getSupabaseServerClient();
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     // Create user profile
-    const { error: profileError } = await supabaseAdmin
+    const { error: profileError } = await supabase
       .from('users')
       .insert([
         {
