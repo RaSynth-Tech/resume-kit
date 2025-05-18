@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { AuthResponse } from '@/types';
+import { DB_TABLES } from '@/config/database';
+import { Database } from '@/types/supabase';
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Create user profile
     const { error: profileError } = await supabase
-      .from('users')
+      .from(DB_TABLES.USERS)
       .insert([
         {
           id: data.user.id,

@@ -1,65 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { DB_TABLES } from '@/config/database';
+import { Database } from '@/types/supabase';
 
-export async function POST(request: NextRequest) {
+type UserRow = Database['public']['Tables']['users']['Row'];
+
+export async function DELETE(request: NextRequest) {
   try {
-    const { userId } = await request.json();
+    const supabase = getSupabaseServerClient();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    if (!userId || typeof userId !== 'string') {
+    if (userError || !user) {
       return NextResponse.json(
-        { success: false, error: 'Valid userId is required' },
-        { status: 400 }
+        { success: false, error: 'Not authenticated' },
+        { status: 401 }
       );
     }
 
-    // Check if user exists in auth.users
-    const supabase = getSupabaseServerClient();
-    const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
-    
-    if (authError) {
-      // If user not found, return success with deleted: false
-      if (authError.message.includes('User not found')) {
-        return NextResponse.json({
-          success: true,
-          deleted: false,
-          message: 'User not found in auth system'
-        });
-      }
-      throw authError;
-    }
-
-    // Delete from public.users first (if exists)
+    // Delete user profile from users table
     const { error: profileError } = await supabase
-      .from('users')
+      .from(DB_TABLES.USERS)
       .delete()
-      .eq('id', userId);
+      .eq('id', user.id);
 
     if (profileError) {
       console.error('Error deleting user profile:', profileError);
-      // Continue with auth deletion even if profile deletion fails
+      return NextResponse.json(
+        { success: false, error: 'Failed to delete user profile' },
+        { status: 500 }
+      );
     }
 
-    // Delete from auth.users
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
+    // Delete auth user
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
 
     if (deleteError) {
-      throw deleteError;
+      console.error('Error deleting auth user:', deleteError);
+      return NextResponse.json(
+        { success: false, error: 'Failed to delete user account' },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      deleted: true,
-      message: 'User successfully deleted'
-    });
-
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete user error:', error);
+    console.error('Delete account error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to delete user',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { success: false, error: 'Failed to delete account' },
       { status: 500 }
     );
   }

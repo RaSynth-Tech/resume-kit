@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
-import { TailoringRequest } from '@/types';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { DB_TABLES, STORAGE_BUCKETS } from '@/config/database';
+import { Database } from '@/types/supabase';
+
+type UserRow = Database['public']['Tables']['users']['Row'];
+type TailoringDataInsert = Database['public']['Tables']['tailoring_data']['Insert'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,10 +34,10 @@ export async function POST(request: NextRequest) {
 
     // Get user profile from users table
     const { data: userData, error: userError } = await supabase
-      .from('users')
+      .from(DB_TABLES.USERS)
       .select('id, email')
       .eq('id', session.user.id)
-      .single();
+      .single<UserRow>();
 
     if (userError || !userData) {
       return NextResponse.json(
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     // Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
-      .from('resumes')
+      .from(STORAGE_BUCKETS.RESUMES)
       .upload(filePath, fileBuffer, {
         contentType: resumeFile.type,
         cacheControl: '3600',
@@ -89,23 +92,26 @@ export async function POST(request: NextRequest) {
 
     // Get public URL for the uploaded file
     const { data: { publicUrl } } = supabase.storage
-      .from('resumes')
+      .from(STORAGE_BUCKETS.RESUMES)
       .getPublicUrl(filePath);
+
     // Store in database with proper user_id mapping
+    const tailoringData: TailoringDataInsert = {
+      id: crypto.randomUUID(),
+      user_id: session.user.id,
+      job_description: jobDescription,
+      resume_path: filePath,
+      created_at: new Date().toISOString()
+    };
+
     const { error: dbError } = await supabase
-      .from('tailoring_data')
-      .insert([{
-        id: crypto.randomUUID(),
-        user_id: session.user.id, // Use the ID from the session
-        job_description: jobDescription,
-        resume_path: filePath,
-        created_at: new Date().toISOString()
-      }]);
+      .from(DB_TABLES.TAILORING_DATA)
+      .insert([tailoringData]);
 
     if (dbError) {
       // If database insert fails, delete the uploaded file
       await supabase.storage
-        .from('resumes')
+        .from(STORAGE_BUCKETS.RESUMES)
         .remove([filePath]);
 
       console.error('Database insert error:', dbError);

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { TailoringHistoryResponse } from '@/types';
+import { DB_TABLES } from '@/config/database';
+import { Database } from '@/types/supabase';
+
+type TailoringDataRow = Database['public']['Tables']['tailoring_data']['Row'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     let query = supabase
-      .from('tailoring_data')
+      .from(DB_TABLES.TAILORING_DATA)
       .select('*')
       .order('created_at', { ascending: false })
       .limit(limit)
@@ -54,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     const response: TailoringHistoryResponse = {
       success: true,
-      data: requests,
+      data: requests as TailoringDataRow[],
     };
 
     return NextResponse.json(response);

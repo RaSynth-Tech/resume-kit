@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { UserProfile } from '@/types';
+import { DB_TABLES } from '@/config/database';
+import { Database } from '@/types/supabase';
+
+type UserRow = Database['public']['Tables']['users']['Row'];
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,10 +20,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: profile, error: profileError } = await supabase
-      .from('users')
+      .from(DB_TABLES.USERS)
       .select('*')
       .eq('id', session.user.id)
-      .single();
+      .single<UserRow>();
 
     if (profileError) throw profileError;
 
@@ -77,11 +81,11 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { data: profile, error: updateError } = await supabase
-      .from('users')
+      .from(DB_TABLES.USERS)
       .update({ name, avatar_url })
       .eq('id', session.user.id)
       .select()
-      .single();
+      .single<UserRow>();
 
     if (updateError) throw updateError;
 
