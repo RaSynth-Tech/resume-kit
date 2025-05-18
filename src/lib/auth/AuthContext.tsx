@@ -27,7 +27,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check session on mount and route changes
   useEffect(() => {
-    checkSession();
+    const hasAuthCookie = document.cookie.includes('sb-'); // Supabase cookie prefix
+    if (hasAuthCookie) {
+      console.log('hasAuthCookie', hasAuthCookie);
+      checkSession();
+    } else {
+      setLoading(false);
+      if (!publicRoutes.includes(pathname)) {
+        router.push('/login');
+      }
+    }
   }, [pathname]); // Re-check session when route changes
 
   const checkSession = async () => {
@@ -149,13 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Show loading state while checking session
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
+
 
   return (
     <AuthContext.Provider value={{ user, loading, error, login, signup, logout }}>
