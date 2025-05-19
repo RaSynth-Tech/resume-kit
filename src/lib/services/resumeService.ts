@@ -114,6 +114,16 @@ export class ResumeService {
 
       throw new Error(`Failed to save resume sections: ${sectionsError.message}`);
     }
+    try {
+      await this.supabase.rpc('send_to_resume_queue', {
+        queue_name: 'resume-processing',
+        message: { tailoringId: tailoringData.id }
+      });
+    } catch (rpcError) {
+      console.error('Failed to send message to queue:', rpcError);
+      // Optionally, you can add additional error handling logic here
+      // For example, you might want to retry the operation or alert an administrator
+    }
     return tailoringData.id!;
   }
 } 

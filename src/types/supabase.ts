@@ -724,6 +724,10 @@ export type Database = {
         Args: { "": string } | { "": unknown } | { "": unknown }
         Returns: string
       }
+      send_to_resume_queue: {
+        Args: { queue_name: string; message: Json }
+        Returns: undefined
+      }
       sparsevec_out: {
         Args: { "": unknown }
         Returns: unknown
