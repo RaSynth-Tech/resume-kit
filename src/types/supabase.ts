@@ -434,6 +434,59 @@ export type Database = {
           },
         ]
       }
+      resume_profiles: {
+        Row: {
+          about_me: string | null
+          created_at: string
+          email: string
+          full_name: string
+          github_url: string | null
+          id: string
+          job_title: string
+          linkedin_url: string | null
+          location: string | null
+          phone: string | null
+          tailoring_id: string
+          website_url: string | null
+        }
+        Insert: {
+          about_me?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          github_url?: string | null
+          id?: string
+          job_title: string
+          linkedin_url?: string | null
+          location?: string | null
+          phone?: string | null
+          tailoring_id: string
+          website_url?: string | null
+        }
+        Update: {
+          about_me?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          github_url?: string | null
+          id?: string
+          job_title?: string
+          linkedin_url?: string | null
+          location?: string | null
+          phone?: string | null
+          tailoring_id?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_profiles_tailoring_id_fkey"
+            columns: ["tailoring_id"]
+            isOneToOne: false
+            referencedRelation: "tailoring_data"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resume_sections: {
         Row: {
           content: string

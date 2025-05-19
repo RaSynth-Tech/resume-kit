@@ -7,4 +7,5 @@ export { default as AwardsSection } from './Awards/Section';
 export { default as ConferencesSection } from './Conferences/Section';
 export { default as InterestsSection } from './Interests/Section';
 export { default as LanguagesSection } from './Languages/Section';
-export { default as PublicationsSection } from './Publications/Section'; 
+export { default as PublicationsSection } from './Publications/Section';
+export { default as ResumeProfileSection } from './ResumeProfile/Section'; 

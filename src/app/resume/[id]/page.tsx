@@ -2,6 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import {
+  ExperienceSection,
+  CertificationsSection,
+  EducationSection,
+  ProjectsSection,
+  AffiliationsSection,
+  AwardsSection,
+  ConferencesSection,
+  InterestsSection,
+  LanguagesSection,
+  PublicationsSection,
+  ResumeProfileSection,
+} from '@/components/sections';
 
 interface Section {
   id: string;
@@ -13,6 +26,21 @@ interface Section {
 interface ApiResponse {
   sections: Section[];
 }
+
+// Mapping section types to components
+const sectionComponents = {
+  experience: ExperienceSection,
+  certifications: CertificationsSection,
+  education: EducationSection,
+  projects: ProjectsSection,
+  affiliations: AffiliationsSection,
+  awards: AwardsSection,
+  conferences: ConferencesSection,
+  interests: InterestsSection,
+  languages: LanguagesSection,
+  publications: PublicationsSection,
+  summary: ResumeProfileSection,
+};
 
 export default function ResumeSectionEditor() {
   const router = useRouter();
@@ -35,6 +63,7 @@ export default function ResumeSectionEditor() {
         if (!res.ok) throw new Error('Failed to fetch sections');
         const data: ApiResponse = await res.json();
         setSections(data.sections);
+        console.log(data.sections);
         if (data.sections.length) {
           setDraftContent(data.sections[0].content);
         }
@@ -85,6 +114,7 @@ export default function ResumeSectionEditor() {
   }
 
   const current = sections[currentIndex];
+  const CurrentSectionComponent = sectionComponents[current.type.toLowerCase() as keyof typeof sectionComponents];
 
   return (
     <main className="min-h-screen bg-gray-50 py-12">
@@ -116,26 +146,19 @@ export default function ResumeSectionEditor() {
             {current.type.charAt(0).toUpperCase() + current.type.slice(1)}
           </h1>
 
-          <div className="grid grid-cols-[1fr_1.5fr] gap-8">
-            {/* Original content */}
-            <div>
-              <h2 className="text-lg font-semibold mb-3">Original Content</h2>
-              <div className="prose whitespace-pre-wrap text-gray-800">
-                {current.content}
-              </div>
-            </div>
-
-            {/* Draft content */}
-            <div>
-              <h2 className="text-lg font-semibold mb-3">Draft Content</h2>
-              <textarea
-                value={draftContent}
-                onChange={(e) => setDraftContent(e.target.value)}
-                className="w-full h-64 border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Edit the draft content here..."
-              />
-            </div>
-          </div>
+          {CurrentSectionComponent && (
+            <CurrentSectionComponent
+              data={current as any}
+              onChange={(field, value) => {
+                const updatedSections = [...sections];
+                updatedSections[currentIndex] = {
+                  ...current,
+                  [field]: value,
+                };
+                setSections(updatedSections);
+              }}
+            />
+          )}
 
           <div className="mt-8 flex justify-between">
             <button
