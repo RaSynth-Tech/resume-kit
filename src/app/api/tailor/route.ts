@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     // Process resume using service
     const resumeService = new ResumeService(supabase);
-    const { resumePath, publicUrl } = await resumeService.processResume(
+    const { tailoringId, resumePath, publicUrl } = await resumeService.processResume(
       resumeFile,
       jobDescription,
       session.user.id,
@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         email: userData.email,
+        tailoringId,
         resumePath,
         publicUrl
       }

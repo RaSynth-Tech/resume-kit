@@ -18,7 +18,7 @@ export class ResumeService {
     jobDescription: string,
     userId: string,
     userEmail: string
-  ): Promise<{ resumePath: string; publicUrl: string }> {
+  ): Promise<{ tailoringId: string; resumePath: string; publicUrl: string }> {
     try {
       // 1. Upload file to storage
       const { filePath, publicUrl } = await this.uploadResume(file, userEmail);
@@ -29,9 +29,9 @@ export class ResumeService {
       console.log('Parsed resume sections:', parsedResume.sections.length);
 
       // 3. Save to database
-      await this.saveToDatabase(parsedResume, filePath, jobDescription, userId);
+      const tailoringId = await this.saveToDatabase(parsedResume, filePath, jobDescription, userId);
 
-      return { resumePath: filePath, publicUrl };
+      return { tailoringId, resumePath: filePath, publicUrl };
     } catch (error) {
       console.error('Error processing resume:', error);
       throw error;
@@ -73,7 +73,7 @@ export class ResumeService {
     filePath: string,
     jobDescription: string,
     userId: string
-  ): Promise<void> {
+  ): Promise<string> {
     // 1. Save tailoring data
     const tailoringData: TailoringDataInsert = {
       id: crypto.randomUUID(),
@@ -114,5 +114,6 @@ export class ResumeService {
 
       throw new Error(`Failed to save resume sections: ${sectionsError.message}`);
     }
+    return tailoringData.id!;
   }
 } 
