@@ -6,6 +6,7 @@ type TableNames = keyof Database['public']['Tables'];
 const DEFAULT_TABLES = {
   USERS: 'users',
   TAILORING_DATA: 'tailoring_data',
+  RESUME_SECTIONS: 'resume_sections'
 } as const;
 
 const DEFAULT_STORAGE = {
@@ -15,6 +16,7 @@ const DEFAULT_STORAGE = {
 export const DB_TABLES = {
   USERS: (process.env.DB_TABLE_USERS || DEFAULT_TABLES.USERS) as TableNames,
   TAILORING_DATA: (process.env.DB_TABLE_TAILORING_DATA || DEFAULT_TABLES.TAILORING_DATA) as TableNames,
+  RESUME_SECTIONS: (process.env.DB_TABLE_RESUME_SECTIONS || DEFAULT_TABLES.RESUME_SECTIONS) as TableNames,
 } as const;
 
 export const STORAGE_BUCKETS = {

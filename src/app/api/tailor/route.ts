@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { DB_TABLES, STORAGE_BUCKETS } from '@/config/database';
-import { Database } from '@/types/supabase';
-
-type UserRow = Database['public']['Tables']['users']['Row'];
-type TailoringDataInsert = Database['public']['Tables']['tailoring_data']['Insert'];
+import { ResumeService } from '@/lib/services/resumeService';
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
+  console.log('API route hit: /api/tailor');
   try {
     const supabase = getSupabaseServerClient();
     
@@ -34,10 +32,10 @@ export async function POST(request: NextRequest) {
 
     // Get user profile from users table
     const { data: userData, error: userError } = await supabase
-      .from(DB_TABLES.USERS)
+      .from('users')
       .select('id, email')
       .eq('id', session.user.id)
-      .single<UserRow>();
+      .single();
 
     if (userError || !userData) {
       return NextResponse.json(
@@ -47,10 +45,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedTypes = ['application/pdf'];
     if (!allowedTypes.includes(resumeFile.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only PDF and DOCX files are allowed' },
+        { error: 'Invalid file type. Only PDF files are allowed' },
         { status: 400 }
       );
     }
@@ -64,68 +62,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique file name
-    const fileExt = resumeFile.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `${userData.email}/${fileName}`;
-
-    // Convert File to ArrayBuffer for Supabase upload
-    const arrayBuffer = await resumeFile.arrayBuffer();
-    const fileBuffer = new Uint8Array(arrayBuffer);
-
-    // Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage
-      .from(STORAGE_BUCKETS.RESUMES)
-      .upload(filePath, fileBuffer, {
-        contentType: resumeFile.type,
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError);
-      return NextResponse.json(
-        { error: 'Failed to upload resume' },
-        { status: 500 }
-      );
-    }
-
-    // Get public URL for the uploaded file
-    const { data: { publicUrl } } = supabase.storage
-      .from(STORAGE_BUCKETS.RESUMES)
-      .getPublicUrl(filePath);
-
-    // Store in database with proper user_id mapping
-    const tailoringData: TailoringDataInsert = {
-      id: crypto.randomUUID(),
-      user_id: session.user.id,
-      job_description: jobDescription,
-      resume_path: filePath,
-      created_at: new Date().toISOString()
-    };
-
-    const { error: dbError } = await supabase
-      .from(DB_TABLES.TAILORING_DATA)
-      .insert([tailoringData]);
-
-    if (dbError) {
-      // If database insert fails, delete the uploaded file
-      await supabase.storage
-        .from(STORAGE_BUCKETS.RESUMES)
-        .remove([filePath]);
-
-      console.error('Database insert error:', dbError);
-      return NextResponse.json(
-        { error: 'Failed to save request' },
-        { status: 500 }
-      );
-    }
+    // Process resume using service
+    const resumeService = new ResumeService(supabase);
+    const { resumePath, publicUrl } = await resumeService.processResume(
+      resumeFile,
+      jobDescription,
+      session.user.id,
+      userData.email
+    );
 
     return NextResponse.json({
       success: true,
       data: {
         email: userData.email,
-        resumePath: filePath,
+        resumePath,
         publicUrl
       }
     });
@@ -133,7 +83,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

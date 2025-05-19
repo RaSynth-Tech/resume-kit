@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      resume_sections: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sort_index: number
+          tailoring_id: string | null
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sort_index: number
+          tailoring_id?: string | null
+          type: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sort_index?: number
+          tailoring_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_sections_tailoring_id_fkey"
+            columns: ["tailoring_id"]
+            isOneToOne: false
+            referencedRelation: "tailoring_data"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tailoring_data: {
         Row: {
           created_at: string
