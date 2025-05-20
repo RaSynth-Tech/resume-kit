@@ -181,7 +181,7 @@ export default function ResumeSectionEditor() {
                 text-sm font-medium
                 transition-all duration-150
                 ${idx === currentIndex
-                  ? 'bg-blue-600 text-white shadow-lg'
+                  ? 'bg-blue-800 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
               `}
             >
@@ -193,9 +193,9 @@ export default function ResumeSectionEditor() {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Left Column: Current Section Editor */}
           <div className="flex-1 bg-white rounded-2xl shadow-xl p-8">
-            <h1 className="text-3xl font-bold mb-6">
+            {/* <h1 className="text-3xl font-bold mb-6">
               {current[0].type.charAt(0).toUpperCase() + current[0].type.slice(1)}
-            </h1>
+            </h1> */}
 
             {CurrentSectionComponent && (
               <CurrentSectionComponent
@@ -224,7 +224,7 @@ export default function ResumeSectionEditor() {
               </button>
               <button
                 onClick={handleNext}
-                className="px-5 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
+                className="px-5 py-2 bg-blue-800 text-white rounded-md text-sm font-medium hover:bg-blue-900"
               >
                 {currentIndex === Object.keys(sections).length - 1 ? 'Review' : 'Next'}
               </button>

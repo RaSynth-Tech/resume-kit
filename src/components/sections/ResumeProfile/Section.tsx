@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResumeProfile } from './types';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaGlobe, FaInfoCircle } from 'react-icons/fa';
+import RichTextEditor from '@/components/RichTextEditor';
 
 interface ResumeProfileSectionProps {
   data: ResumeProfile[];
@@ -16,7 +17,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
     <div className="p-4 flex flex-col md:flex-row gap-4">
       <div className="flex-1">
         <div className="flex items-center mb-2">
-          <FaUser className="mr-2" />
+          <FaUser className="mr-2 text-[#1e40af]" />
           <input
             type="text"
             value={resumeProfile.full_name}
@@ -26,7 +27,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           />
         </div>
         <div className="flex items-center mb-2">
-          <FaEnvelope className="mr-2" />
+          <FaEnvelope className="mr-2 text-[#1e40af]" />
           <input
             type="email"
             value={resumeProfile.email}
@@ -36,7 +37,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           />
         </div>
         <div className="flex items-center mb-2">
-          <FaPhone className="mr-2" />
+          <FaPhone className="mr-2 text-[#1e40af]" />
           <input
             type="text"
             value={resumeProfile.phone || ''}
@@ -46,7 +47,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           />
         </div>
         <div className="flex items-center mb-2">
-          <FaMapMarkerAlt className="mr-2" />
+          <FaMapMarkerAlt className="mr-2 text-[#1e40af]" />
           <input
             type="text"
             value={resumeProfile.location || ''}
@@ -56,7 +57,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           />
         </div>
         <div className="flex items-center mb-2">
-          <FaGithub className="mr-2" />
+          <FaGithub className="mr-2 text-[#1e40af]" />
           <input
             type="text"
             value={resumeProfile.github_url || ''}
@@ -66,7 +67,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           />
         </div>
         <div className="flex items-center mb-2">
-          <FaLinkedin className="mr-2" />
+          <FaLinkedin className="mr-2 text-[#1e40af]" />
           <input
             type="text"
             value={resumeProfile.linkedin_url || ''}
@@ -76,7 +77,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           />
         </div>
         <div className="flex items-center mb-2">
-          <FaGlobe className="mr-2" />
+          <FaGlobe className="mr-2 text-[#1e40af]" />
           <input
             type="text"
             value={resumeProfile.website_url || ''}
@@ -87,13 +88,10 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
         </div>
       </div>
       <div className="flex-1">
-        <label htmlFor="aboutMe" className="block text-sm font-medium text-gray-700 mb-1">About Me</label>
-        <textarea
-          id="aboutMe"
+        <label htmlFor="aboutMe" className="block text-md font-bold font-medium text-[#1e40af] mb-1">ABOUT ME</label>
+        <RichTextEditor
           value={resumeProfile.about_me || ''}
-          onChange={(e) => onChange('about_me', e.target.value)}
-          className="w-full h-32 p-2 border rounded"
-          placeholder="About Me"
+          onChange={(value) => onChange('about_me', value)}
         />
       </div>
     </div>
