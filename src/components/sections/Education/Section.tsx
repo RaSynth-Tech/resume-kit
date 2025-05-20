@@ -24,7 +24,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
         placeholder="Degree"
       />
       <textarea
-        value={data.coursework?.join('\n') || ''}
+        value={data.degree || ''}
         onChange={(e) => onChange('coursework', e.target.value.split('\n'))}
         className="w-full p-2 mb-2 border rounded"
         placeholder="Coursework"
