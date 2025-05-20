@@ -1,7 +1,7 @@
 import React from 'react';
 import { ResumeProfile } from './types';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaGlobe, FaInfoCircle } from 'react-icons/fa';
-import RichTextEditor from '@/components/RichTextEditor';
+import RichTextEditor from '@/components/common/RichTextEditor';
 
 interface ResumeProfileSectionProps {
   data: ResumeProfile[];

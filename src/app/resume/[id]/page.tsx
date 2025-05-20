@@ -15,7 +15,7 @@ import {
   PublicationsSection,
   ResumeProfileSection,
 } from '@/components/sections';
-import ResumePreview from '@/components/ResumePreview';
+import ResumePreview from '@/components/resume/ResumePreview';
 
 interface Section {
   id: string;
