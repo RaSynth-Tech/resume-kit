@@ -12,7 +12,7 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
   const resumeProfile = data[0];
   console.log(data,"data");
   return (
-    <div className="p-4 border rounded-md">
+    <div className="p-4 ">
       <input
         type="text"
         value={resumeProfile.full_name}

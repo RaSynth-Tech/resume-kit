@@ -166,7 +166,7 @@ export default function ResumeSectionEditor() {
   const CurrentSectionComponent = sectionComponents[current[0].type.toLowerCase() as keyof typeof sectionComponents];
   return (
     <main className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
         {/* Centered, pill-style section nav */}
         <div className="flex justify-center space-x-3 overflow-x-auto mb-8">
           {sectionTypes.map((type, idx) => (
