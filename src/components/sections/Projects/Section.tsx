@@ -25,7 +25,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
             placeholder="Description"
           />
           <textarea
-            value={project.bullets.join('\n')}
+            value={(project.bullets || []).join('\n')}
             onChange={(e) => onChange(index, 'bullets', e.target.value.split('\n'))}
             className="w-full p-2 mb-2 border rounded"
             placeholder="Bullets"
