@@ -24,7 +24,7 @@ interface Section {
 }
 
 interface ApiResponse {
-  sections: Section[];
+  [key: string]: Section[];
 }
 
 // Mapping section types to components
@@ -62,10 +62,16 @@ export default function ResumeSectionEditor() {
         const res = await fetch(`/api/resume/${id}/sections`);
         if (!res.ok) throw new Error('Failed to fetch sections');
         const data: ApiResponse = await res.json();
-        setSections(data.sections);
-        console.log(data.sections);
-        if (data.sections.length) {
-          setDraftContent(data.sections[0].content);
+
+        // Flatten the sections into a single array
+        const flattenedSections: Section[] = Object.entries(data).flatMap(([type, sections]) =>
+          sections.map(section => ({ ...section, type }))
+        );
+
+        setSections(flattenedSections);
+        console.log(flattenedSections);
+        if (flattenedSections.length) {
+          setDraftContent(flattenedSections[0].content);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));

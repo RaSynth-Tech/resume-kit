@@ -97,7 +97,7 @@ export type Database = {
       certifications: {
         Row: {
           created_at: string
-          date_earned: string
+          date_earned: string | null
           expiration_date: string | null
           id: string
           issuer: string
@@ -107,7 +107,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          date_earned: string
+          date_earned?: string | null
           expiration_date?: string | null
           id?: string
           issuer: string
@@ -117,7 +117,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          date_earned?: string
+          date_earned?: string | null
           expiration_date?: string | null
           id?: string
           issuer?: string
@@ -181,7 +181,6 @@ export type Database = {
       }
       education: {
         Row: {
-          coursework: string[] | null
           created_at: string
           degree: string
           end_date: string | null
@@ -189,12 +188,12 @@ export type Database = {
           id: string
           institution: string
           location: string | null
+          major: string | null
           sort_index: number
           start_date: string | null
           tailoring_id: string
         }
         Insert: {
-          coursework?: string[] | null
           created_at?: string
           degree: string
           end_date?: string | null
@@ -202,12 +201,12 @@ export type Database = {
           id?: string
           institution: string
           location?: string | null
+          major?: string | null
           sort_index: number
           start_date?: string | null
           tailoring_id: string
         }
         Update: {
-          coursework?: string[] | null
           created_at?: string
           degree?: string
           end_date?: string | null
@@ -215,6 +214,7 @@ export type Database = {
           id?: string
           institution?: string
           location?: string | null
+          major?: string | null
           sort_index?: number
           start_date?: string | null
           tailoring_id?: string
@@ -521,6 +521,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "resume_sections_tailoring_id_fkey"
+            columns: ["tailoring_id"]
+            isOneToOne: false
+            referencedRelation: "tailoring_data"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      section_order: {
+        Row: {
+          id: string
+          section_index: number
+          section_type: string
+          tailoring_id: string
+        }
+        Insert: {
+          id?: string
+          section_index: number
+          section_type: string
+          tailoring_id: string
+        }
+        Update: {
+          id?: string
+          section_index?: number
+          section_type?: string
+          tailoring_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "section_order_tailoring_id_fkey"
             columns: ["tailoring_id"]
             isOneToOne: false
             referencedRelation: "tailoring_data"

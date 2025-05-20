@@ -26,7 +26,6 @@ export class ResumeService {
       // 2. Parse resume
       const parser = this.parserFactory.getParser('basic');
       const parsedResume = await parser.parse(file);
-      console.log('Parsed resume sections:', parsedResume.sections.length);
 
       // 3. Save to database
       const tailoringId = await this.saveToDatabase(parsedResume, filePath, jobDescription, userId);
