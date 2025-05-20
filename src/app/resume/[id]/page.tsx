@@ -15,6 +15,7 @@ import {
   PublicationsSection,
   ResumeProfileSection,
 } from '@/components/sections';
+import ResumePreview from '@/components/ResumePreview';
 
 interface Section {
   id: string;
@@ -189,43 +190,49 @@ export default function ResumeSectionEditor() {
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h1 className="text-3xl font-bold mb-6">
-            {current[0].type.charAt(0).toUpperCase() + current[0].type.slice(1)}
-          </h1>
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Left Column: Current Section Editor */}
+          <div className="flex-1 bg-white rounded-2xl shadow-xl p-8">
+            <h1 className="text-3xl font-bold mb-6">
+              {current[0].type.charAt(0).toUpperCase() + current[0].type.slice(1)}
+            </h1>
 
-          {CurrentSectionComponent && (
-            <CurrentSectionComponent
-              data={current as any}
-              onChange={(field, value) => {
-                const updatedSections = { ...sections };
-                const sectionToUpdate = { ...current[currentIndex], [field]: value };
-                updatedSections[currentSectionType][currentIndex] = sectionToUpdate;
-                setSections(updatedSections);
-              }}
-            />
-          )}
+            {CurrentSectionComponent && (
+              <CurrentSectionComponent
+                data={current as any}
+                onChange={(field, value) => {
+                  const updatedSections = { ...sections };
+                  const sectionToUpdate = { ...current[currentIndex], [field]: value };
+                  updatedSections[currentSectionType][currentIndex] = sectionToUpdate;
+                  setSections(updatedSections);
+                }}
+              />
+            )}
 
-          <div className="mt-8 flex justify-between">
-            <button
-              onClick={handlePrevious}
-              disabled={currentIndex === 0}
-              className={`
-                px-5 py-2 rounded-md text-sm font-medium
-                ${currentIndex === 0
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'}
-              `}
-            >
-              Previous
-            </button>
-            <button
-              onClick={handleNext}
-              className="px-5 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
-            >
-              {currentIndex === Object.keys(sections).length - 1 ? 'Review' : 'Next'}
-            </button>
+            <div className="mt-8 flex justify-between">
+              <button
+                onClick={handlePrevious}
+                disabled={currentIndex === 0}
+                className={`
+                  px-5 py-2 rounded-md text-sm font-medium
+                  ${currentIndex === 0
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'}
+                `}
+              >
+                Previous
+              </button>
+              <button
+                onClick={handleNext}
+                className="px-5 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
+              >
+                {currentIndex === Object.keys(sections).length - 1 ? 'Review' : 'Next'}
+              </button>
+            </div>
           </div>
+
+          {/* Right Column: Resume Preview */}
+          <ResumePreview sections={sections} />
         </div>
       </div>
     </main>
