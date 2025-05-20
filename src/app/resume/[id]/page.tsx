@@ -161,9 +161,9 @@ export default function ResumeSectionEditor() {
 
   const sectionTypes = Object.keys(sections);
   const currentSectionType = Object.keys(sections)[currentIndex];
-  const current = sections[currentSectionType][0];
-  console.log(current.type.toLocaleLowerCase(),"current");
-  const CurrentSectionComponent = sectionComponents[current.type.toLowerCase() as keyof typeof sectionComponents];
+  const current = sections[currentSectionType];
+  console.log(sectionTypes,"current");
+  const CurrentSectionComponent = sectionComponents[current[0].type.toLowerCase() as keyof typeof sectionComponents];
   return (
     <main className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -184,14 +184,14 @@ export default function ResumeSectionEditor() {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
               `}
             >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {type.toUpperCase()}
             </button>
           ))}
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h1 className="text-3xl font-bold mb-6">
-            {current.type.charAt(0).toUpperCase() + current.type.slice(1)}
+            {current[0].type.charAt(0).toUpperCase() + current[0].type.slice(1)}
           </h1>
 
           {CurrentSectionComponent && (
@@ -199,10 +199,8 @@ export default function ResumeSectionEditor() {
               data={current as any}
               onChange={(field, value) => {
                 const updatedSections = { ...sections };
-                updatedSections[current.type][currentIndex] = {
-                  ...current,
-                  [field]: value,
-                };
+                const sectionToUpdate = { ...current[currentIndex], [field]: value };
+                updatedSections[currentSectionType][currentIndex] = sectionToUpdate;
                 setSections(updatedSections);
               }}
             />
