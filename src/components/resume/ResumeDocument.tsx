@@ -12,8 +12,8 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
         className="resume-container mx-auto"
         style={{ 
           fontFamily: 'Trebuchet MS', 
-          fontSize: '24px', 
-          padding: '32px 40px', 
+          fontSize: '28px', 
+          padding: '10px 48px', 
           margin: '32px auto',
           border: '1px solid #000',
           backgroundColor: 'white',
@@ -23,16 +23,16 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
         }}
       >
         {/* ---------- Header ---------- */}
-        <header className="avoid-break border-b border-gray-300 pb-4 text-center">
-          <h1 className="text-xl font-semibold tracking-wide text-[18px]">
+        <header className="avoid-break border-b border-gray-300 pb-6 text-center">
+          <h1 className="text-xl font-semibold tracking-wide text-[22px]">
             {p.full_name}
           </h1>
-          <h2 className="text-lg font-medium text-gray-600 text-[14px]">
+          <h2 className="text-lg font-medium text-gray-600 text-[16px]">
             {p.job_title}
           </h2>
 
           {/* Contact Info */}
-          <div className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[14px] text-gray-600">
+          <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[16px] text-gray-600">
             {p.email && <span className="text-gray-400">•</span>}
             {p.email && <span>{p.email}</span>}
             {p.email && p.phone && <span className="text-gray-400">•</span>}
@@ -42,7 +42,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
           </div>
 
           {/* Links */}
-          <div className="mt-1 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-gray-600">
+          <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-gray-600">
             {p.linkedin_url && <span className="text-gray-400">•</span>}
             {p.linkedin_url && <a href={p.linkedin_url}>{p.linkedin_url}</a>}
             {p.linkedin_url && p.github_url && <span className="text-gray-400">•</span>}
@@ -56,7 +56,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
         {p.about_me && (
           <section className="avoid-break mt-2">
             <SectionHeading>Summary</SectionHeading>
-            <p className="text-[10px]">{p.about_me}</p>
+            <p className="text-[12px] mt-1">{p.about_me}</p>
           </section>
         )}
 
@@ -65,7 +65,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
           <section className="avoid-break mt-2 space-y-2">
             <SectionHeading>Experience</SectionHeading>
             {data.experiences.map((exp) => (
-              <div key={exp.id} className="text-[10px]">
+              <div key={exp.id} className="text-[12px]">
                 <div className="flex justify-between font-medium">
                   <span>
                     {exp.title} – {exp.company}
@@ -86,10 +86,10 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
 
         {/* ---------- Education ---------- */}
         {data.education.length > 0 && (
-          <section className="avoid-break mt-3 space-y-2">
+          <section className="avoid-break mt-2 space-y-2">
             <SectionHeading>Education</SectionHeading>
             {data.education.map((edu) => (
-              <div key={edu.id} className="text-[10px]">
+              <div key={edu.id} className="text-[12px]">
                 <div className="flex justify-between font-medium">
                   <span>
                     {edu.degree} – {edu.school}
@@ -109,7 +109,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
           <section className="avoid-break mt-2 space-y-2">
             <SectionHeading>Certifications</SectionHeading>
             {data.certifications.map((cert) => (
-              <div key={cert.id} className="text-[10px]">
+              <div key={cert.id} className="text-[12px]">
                 <div className="flex justify-between font-medium">
                   <span>{cert.name}</span>
                   <span className="shrink-0">
@@ -127,7 +127,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
           <section className="avoid-break mt-2 mb-2 space-y-2">
             <SectionHeading>Projects</SectionHeading>
             {data.projects.map((proj) => (
-              <div key={proj.id} className="text-[10px]">
+              <div key={proj.id} className="text-[12px]">
                 <div className="flex justify-between font-medium">
                   <span>{proj.name}</span>
                   <span className="shrink-0">
@@ -147,7 +147,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, { data: ResumeData }>
 /* ---------- tiny helpers ---------- */
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="border-b border-gray-300 pb-1 text-[11px] font-semibold uppercase tracking-widest text-gray-500 avoid-break">
+    <h3 className="border-b border-gray-300 pb-2 text-[14px] font-semibold uppercase tracking-widest text-gray-500 avoid-break">
       {children}
     </h3>
   );
