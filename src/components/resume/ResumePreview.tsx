@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import ResumeDocument from './ResumeDocument';
+import { ResumeView } from './ResumeDocument';
 import { usePDF } from 'react-to-pdf';
 
 interface ResumeData {
@@ -27,11 +27,11 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
       <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Resume Preview</h2>
       <div className="mb-4 overflow-auto" style={{ maxHeight: '400px' }}>
         <div 
-          ref={targetRef} 
+          
           className="bg-white transform scale-[0.6] origin-top-left"
           style={{ width: '595px', height: '842px' }}
         >
-          <ResumeDocument data={sections} />
+          <ResumeView ref={targetRef}  data={sections} />
         </div>
       </div>
       <div className="flex justify-center">
