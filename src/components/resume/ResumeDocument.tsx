@@ -5,29 +5,37 @@ export default function ResumeView({ data }: { data: ResumeData }) {
   const p = data.profile[0];
 
   return (
-    <article className="mx-auto max-w-[816px] bg-white px-2 py-2 text-[11px] leading-[1.35] print:m-0 print:p-0">
+    <article className="mx-auto max-w-[816px] bg-white px-2 py-2 text-[10px] leading-[1.35] print:m-0 print:p-0" style={{ fontFamily: 'Trebuchet MS' }}>
       {/* ---------- Header ---------- */}
-      <header className="border-b  border-gray-300 pb-4">
-        <h1 className="text-2xl font-semibold tracking-wide">{p.full_name}</h1>
-        <h2 className="text-lg font-medium text-gray-600">{p.job_title}</h2>
+      <header className="border-b border-gray-300 pb-4 text-center">
+        <h1 className="text-xl font-semibold tracking-wide text-[18px]">{p.full_name}</h1>
+        <h2 className="text-lg font-medium text-gray-600 text-[14px]">{p.job_title}</h2>
 
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-gray-600">
+        <div className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-gray-600">
+          {p.email  && <span className="text-gray-400">•</span>}
           {p.email && <span>{p.email}</span>}
+          {p.email && p.phone && <span className="text-gray-400">•</span>}
           {p.phone && <span>{p.phone}</span>}
+          {p.phone && p.location && <span className="text-gray-400">•</span>}
           {p.location && <span>{p.location}</span>}
-          {p.linkedin_url && <a href={p.linkedin_url}>LinkedIn</a>}
-          {p.github_url && <a href={p.github_url}>GitHub</a>}
-          {p.website_url && <a href={p.website_url}>Portfolio</a>}
+        </div>
+        <div className="mt-1 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-gray-600">
+          {p.linkedin_url&& <span className="text-gray-400">•</span>}
+          {p.linkedin_url && <a href={p.linkedin_url}>{p.linkedin_url}</a>}
+          {p.linkedin_url && p.github_url && <span className="text-gray-400">•</span>}
+          {p.github_url && <a href={p.github_url}>{p.github_url}</a>}
+          {p.github_url && p.website_url && <span className="text-gray-400">•</span>}
+          {p.website_url && <a href={p.website_url}>{p.website_url}</a>}
         </div>
       </header>
 
       {/* ---------- About ---------- */}
       {p.about_me && (
-        <section className="mt-4">
-          <h3 className="mb-1 text-[12px] font-semibold uppercase tracking-widest text-gray-500">
+        <section className="mt-2">
+          <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-gray-500">
             Summary
           </h3>
-          <p>{p.about_me}</p>
+          <p className="text-[10px]">{p.about_me}</p>
         </section>
       )}
 
@@ -37,7 +45,7 @@ export default function ResumeView({ data }: { data: ResumeData }) {
           <SectionHeading>Experience</SectionHeading>
 
           {data.experiences.map((exp) => (
-            <div key={exp.id}>
+            <div key={exp.id} className="text-[10px]">
               <div className="flex justify-between font-medium">
                 <span>{exp.title} – {exp.company}</span>
                 <span className="shrink-0">
@@ -45,7 +53,7 @@ export default function ResumeView({ data }: { data: ResumeData }) {
                 </span>
               </div>
 
-              <ul className="ml-2 list-disc">
+              <ul className="list-disc">
                 {exp.bullets.map((b, i) => (
                   <li key={i}>{b}</li>
                 ))}
@@ -61,7 +69,7 @@ export default function ResumeView({ data }: { data: ResumeData }) {
           <SectionHeading>Education</SectionHeading>
 
           {data.education.map((edu) => (
-            <div key={edu.id}>
+            <div key={edu.id} className="text-[10px]">
               <div className="flex justify-between font-medium">
                 <span>{edu.degree} – {edu.school}</span>
                 <span className="shrink-0">
@@ -80,7 +88,7 @@ export default function ResumeView({ data }: { data: ResumeData }) {
           <SectionHeading>Certifications</SectionHeading>
 
           {data.certifications.map((cert) => (
-            <div key={cert.id}>
+            <div key={cert.id} className="text-[10px]">
               <div className="flex justify-between font-medium">
                 <span>{cert.name}</span>
                 <span className="shrink-0">
@@ -95,11 +103,11 @@ export default function ResumeView({ data }: { data: ResumeData }) {
       )}
 
       {data.projects.length > 0 && (
-        <section className="mt-2 space-y-2">
+        <section className="mt-2 mb-2 space-y-2">
           <SectionHeading>Projects</SectionHeading>
 
           {data.projects.map((proj) => (
-            <div key={proj.id}>
+            <div key={proj.id} className="text-[10px]">
               <div className="flex justify-between font-medium">
                 <span>{proj.name}</span>
                 <span className="shrink-0">
@@ -119,7 +127,7 @@ export default function ResumeView({ data }: { data: ResumeData }) {
 /* ---------- tiny helpers ---------- */
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="border-b border-gray-300 pb-1 text-[12px] font-semibold uppercase tracking-widest text-gray-500">
+    <h3 className="border-b border-gray-300 pb-1 text-[11px] font-semibold uppercase tracking-widest text-gray-500">
       {children}
     </h3>
   );

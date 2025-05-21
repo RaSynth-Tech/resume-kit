@@ -21,7 +21,7 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
   const calculateScale = () => {
     const scaleWidth = window.innerWidth / 595;
     const scaleHeight = window.innerHeight / 842;
-    return Math.min(scaleWidth, scaleHeight, 1.2); // Allow scale to exceed 1 slightly for better visibility
+    return Math.min(scaleWidth, scaleHeight);
   };
 
   useEffect(() => {
@@ -34,7 +34,15 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
   }, [isModalOpen]);
 
   const onViewResume = () => {
-    setIsModalOpen(true); // Open the modal
+    setIsModalOpen(true);
+    setScale(calculateScale()); // Set scale when opening the modal
+  };
+
+  // Set fixed A4 dimensions and enable scrolling for overflow
+  const modalStyle = {
+    width: '595px',
+    height: '842px',
+    overflow: 'auto', // Enable scrolling
   };
 
   return (
@@ -44,19 +52,16 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
         View Resume
       </button>
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50"
+          onClick={() => setIsModalOpen(false)}
+        >
           <div
-            className="bg-white p-2 rounded-lg mx-4 overflow-hidden"
-            style={{
-              width: '595px',
-              height: '842px',
-              transform: `scale(${Math.min(window.innerWidth / 595, (window.innerHeight * 0.9) / 842, 1)})`,
-            }}
+            className="bg-white p-4 pt-6 rounded-lg mx-4 overflow-hidden"
+            style={modalStyle}
+            onClick={(e) => e.stopPropagation()}
           >
             <ResumeDocument data={sections} />
-            <button onClick={() => setIsModalOpen(false)} className="bg-red-500 text-white px-4 py-2 rounded mt-4">
-              Close
-            </button>
           </div>
         </div>
       )}
