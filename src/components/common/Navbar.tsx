@@ -12,7 +12,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold text-primary">ResumeKit</span>
+              <span className="text-xl font-bold text-blue-800">ResumeKit</span>
             </Link>
           </div>
           
