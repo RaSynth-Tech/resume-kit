@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import TailoringForm from '@/components/TailoringForm';
+import TailoringForm from '@/components/resume/TailoringForm';
 import { TailoringFormData } from '@/types';
 
 export default function TailorPage() {
