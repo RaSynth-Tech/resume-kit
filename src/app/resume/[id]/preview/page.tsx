@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ResumeView } from '@/components/resume/ResumeDocument';
 import { ResumeData, Profile, Experience, Education, Certification, Project } from '@/types/resume';
 import { usePDF } from 'react-to-pdf';
@@ -24,6 +24,7 @@ interface ApiResponse {
 
 export default function ResumePreviewPage() {
   const params = useParams();
+  const router = useRouter();
   const { toPDF, targetRef } = usePDF({filename: 'resume.pdf'});
   const [sections, setSections] = useState<ResumeData>({
     profile: [],
@@ -96,11 +97,17 @@ export default function ResumePreviewPage() {
 
   return (
     <main className="min-h-screen bg-white-50 py-12">
-      <div className=" mx-auto px-4">
-        <div className="mb-4 flex justify-end">
+      <div className="mx-auto px-4">
+        <div className="mb-4 flex justify-between items-center">
+          <button
+            onClick={() => router.push(`/resume/${id}`)}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+          >
+            Go Back
+          </button>
           <button
             onClick={() => toPDF()}
-            className="bg-blue-600 hover:bg-white-100 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
           >
             Download PDF
           </button>
