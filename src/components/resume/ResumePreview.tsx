@@ -21,7 +21,7 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
   const calculateScale = () => {
     const scaleWidth = window.innerWidth / 595;
     const scaleHeight = window.innerHeight / 842;
-    return Math.min(scaleWidth, scaleHeight, 1); // Ensure scale does not exceed 1
+    return Math.min(scaleWidth, scaleHeight, 1.2); // Allow scale to exceed 1 slightly for better visibility
   };
 
   useEffect(() => {
@@ -46,11 +46,11 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
           <div
-            className="bg-white p-4 rounded-lg mx-4 overflow-hidden"
+            className="bg-white p-2 rounded-lg mx-4 overflow-hidden"
             style={{
               width: '595px',
               height: '842px',
-              transform: `scale(${Math.min(window.innerWidth / 595, (window.innerHeight * 0.8) / 842, 1)})`,
+              transform: `scale(${Math.min(window.innerWidth / 595, (window.innerHeight * 0.9) / 842, 1)})`,
             }}
           >
             <ResumeDocument data={sections} />
