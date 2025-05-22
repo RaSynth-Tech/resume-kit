@@ -19,11 +19,8 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <Link href="/tailor" className="btn-secondary">
-                  Tailor Resume
-                </Link>
-                <Link href="/kit" className="btn-primary">
-                  My Kit
+                <Link href="/dashboard" className="btn-secondary">
+                  Dashboard
                 </Link>
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-700">
