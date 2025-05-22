@@ -55,6 +55,32 @@ export default function ResumeSectionEditor() {
 
   const id = params?.id as string;
 
+  const handleSectionChange = (fieldOrIndex: string | number, valueOrField?: any, value?: any) => {
+    setSections(prevSections => {
+      const updatedSections = { ...prevSections };
+      const currentSectionType = Object.keys(prevSections)[currentIndex];
+      
+      if (!updatedSections[currentSectionType]) {
+        return prevSections;
+      }
+
+      // Handle both function signatures
+      const field = typeof fieldOrIndex === 'number' ? valueOrField : fieldOrIndex;
+      const newValue = typeof fieldOrIndex === 'number' ? value : valueOrField;
+      const index = typeof fieldOrIndex === 'number' ? fieldOrIndex : 0;
+
+      // Update the specific section at the given index
+      const updatedSectionArray = [...updatedSections[currentSectionType]];
+      updatedSectionArray[index] = {
+        ...updatedSectionArray[index],
+        [field]: newValue
+      };
+
+      updatedSections[currentSectionType] = updatedSectionArray;
+      return updatedSections;
+    });
+  };
+
   useEffect(() => {
     const fetchSections = async () => {
       if (!id) return;
@@ -163,12 +189,10 @@ export default function ResumeSectionEditor() {
   const sectionTypes = Object.keys(sections);
   const currentSectionType = Object.keys(sections)[currentIndex];
   const current = sections[currentSectionType];
-  console.log(sectionTypes,"current");
   const CurrentSectionComponent = sectionComponents[current[0].type.toLowerCase() as keyof typeof sectionComponents];
   return (
     <main className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Centered, pill-style section nav */}
         <div className="flex justify-center space-x-3 overflow-x-auto mb-8">
           {sectionTypes.map((type, idx) => (
             <button
@@ -191,21 +215,11 @@ export default function ResumeSectionEditor() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Left Column: Current Section Editor */}
           <div className="flex-1 bg-white rounded-2xl shadow-xl p-8">
-            {/* <h1 className="text-3xl font-bold mb-6">
-              {current[0].type.charAt(0).toUpperCase() + current[0].type.slice(1)}
-            </h1> */}
-
             {CurrentSectionComponent && (
               <CurrentSectionComponent
                 data={current as any}
-                onChange={(field, value) => {
-                  const updatedSections = { ...sections };
-                  const sectionToUpdate = { ...current[currentIndex], [field]: value };
-                  updatedSections[currentSectionType][currentIndex] = sectionToUpdate;
-                  setSections(updatedSections);
-                }}
+                onChange={handleSectionChange}
               />
             )}
 

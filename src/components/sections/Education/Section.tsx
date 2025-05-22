@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Education } from './types';
+import { FaChevronDown, FaChevronUp, FaUniversity, FaGraduationCap, FaCalendarAlt, FaMapMarkerAlt, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import RichTextEditor from '@/components/common/RichTextEditor';
 
 interface EducationSectionProps {
   data: Education[];
@@ -7,56 +9,166 @@ interface EducationSectionProps {
 }
 
 const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) => {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+
+  const toggleAccordion = (index: number) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
   return (
-    <div>
+    <div className="space-y-4">
       {data.map((education, index) => (
-        <div key={index} className="p-4 border rounded-md mb-4">
-          <input
-            type="text"
-            value={education.institution}
-            onChange={(e) => onChange(index, 'institution', e.target.value)}
-            className="w-full p-2 mb-2 border rounded"
-            placeholder="Institution"
-          />
-          <input
-            type="text"
-            value={education.degree}
-            onChange={(e) => onChange(index, 'degree', e.target.value)}
-            className="w-full p-2 mb-2 border rounded"
-            placeholder="Degree"
-          />
-          <textarea
-            value={education.degree || ''}
-            onChange={(e) => onChange(index, 'coursework', e.target.value.split('\n'))}
-            className="w-full p-2 mb-2 border rounded"
-            placeholder="Coursework"
-          />
-          <input
-            type="date"
-            value={education.start_date || ''}
-            onChange={(e) => onChange(index, 'start_date', e.target.value)}
-            className="w-full p-2 mb-2 border rounded"
-          />
-          <input
-            type="date"
-            value={education.end_date || ''}
-            onChange={(e) => onChange(index, 'end_date', e.target.value)}
-            className="w-full p-2 mb-2 border rounded"
-          />
-          <div className="flex items-center">
-            <button
-              onClick={() => onChange(index, 'sort_index', education.sort_index - 1)}
-              className="p-2 mr-2 bg-gray-200 rounded"
-            >
-              Up
-            </button>
-            <button
-              onClick={() => onChange(index, 'sort_index', education.sort_index + 1)}
-              className="p-2 bg-gray-200 rounded"
-            >
-              Down
-            </button>
+        <div 
+          key={index} 
+          className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
+        >
+          {/* Accordion Header */}
+          <div 
+            className="p-4 cursor-pointer flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+            onClick={() => toggleAccordion(index)}
+          >
+            <div className="flex items-center space-x-3">
+              <FaUniversity className="text-[#1e40af] text-lg" />
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  {education.institution || 'New Institution'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {education.degree || 'Add Degree'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="flex space-x-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onChange(index, 'sort_index', education.sort_index - 1);
+                  }}
+                  className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <FaArrowUp />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onChange(index, 'sort_index', education.sort_index + 1);
+                  }}
+                  className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <FaArrowDown />
+                </button>
+              </div>
+              {expandedIndex === index ? (
+                <FaChevronUp className="text-gray-500" />
+              ) : (
+                <FaChevronDown className="text-gray-500" />
+              )}
+            </div>
           </div>
+
+          {/* Accordion Content */}
+          {expandedIndex === index && (
+            <div className="p-4 space-y-4 border-t">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Institution</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={education.institution}
+                      onChange={(e) => onChange(index, 'institution', e.target.value)}
+                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
+                      placeholder="Enter institution name"
+                    />
+                    <FaUniversity className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Degree</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={education.degree}
+                      onChange={(e) => onChange(index, 'degree', e.target.value)}
+                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
+                      placeholder="Enter degree"
+                    />
+                    <FaGraduationCap className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={education.start_date || ''}
+                      onChange={(e) => onChange(index, 'start_date', e.target.value)}
+                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
+                    />
+                    <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">End Date</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={education.end_date || ''}
+                      onChange={(e) => onChange(index, 'end_date', e.target.value)}
+                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
+                    />
+                    <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Major</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={education.major || ''}
+                      onChange={(e) => onChange(index, 'major', e.target.value)}
+                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
+                      placeholder="Enter major"
+                    />
+                    <FaGraduationCap className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Location</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={education.location || ''}
+                      onChange={(e) => onChange(index, 'location', e.target.value)}
+                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
+                      placeholder="Enter location"
+                    />
+                    <FaMapMarkerAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Coursework</label>
+                <div className="relative">
+                  <RichTextEditor
+                    value={education.coursework?.join('\n') || ''}
+                    onChange={(value) => onChange(index, 'coursework', value.split('\n'))}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
