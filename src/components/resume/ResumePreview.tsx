@@ -29,9 +29,9 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 max-w-xs mx-auto">
       <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Resume Preview</h2>
-      <div className="mb-4 overflow-auto" style={{ maxHeight: '400px' }}>
+      <div className="mb-4  flex overflow-hidden flex items-center justify-center align-middle" style={{ maxHeight: '300px' }}>
         <div 
-          className="bg-white origin-top-left"
+          className="origin-center transform scale-[0.25]"
           style={{ width: '595px', height: '842px' }}
         >
           <ResumeView ref={targetRef} data={sections} />
