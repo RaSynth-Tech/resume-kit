@@ -7,31 +7,36 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold text-blue-800">ResumeKit</span>
+          <div className="flex items-center">
+            <Link 
+              href="/" 
+              className="flex items-center space-x-2 transition-colors duration-200 hover:text-blue-600"
+            >
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                ResumeKit
+              </span>
             </Link>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {user ? (
               <>
-                <Link href="/tailor" className="btn-secondary">
-                  Tailor Resume
+                <Link 
+                  href="/dashboard" 
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                >
+                  Dashboard
                 </Link>
-                <Link href="/kit" className="btn-primary">
-                  My Kit
-                </Link>
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-700">
+                <div className="flex items-center space-x-4 border-l border-gray-200 pl-6">
+                  <span className="text-sm font-medium text-gray-700">
                     {user.name || user.email}
                   </span>
                   <button
                     onClick={() => logout()}
-                    className="text-sm text-gray-700 hover:text-gray-900"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
                   >
                     Logout
                   </button>
@@ -39,10 +44,16 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/login" className="text-sm text-gray-700 hover:text-gray-900">
+                <Link 
+                  href="/login" 
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                >
                   Login
                 </Link>
-                <Link href="/signup" className="btn-primary">
+                <Link 
+                  href="/signup" 
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                >
                   Sign Up
                 </Link>
               </>

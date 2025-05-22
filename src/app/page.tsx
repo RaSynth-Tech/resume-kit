@@ -1,7 +1,16 @@
 import Link from 'next/link';
 import { PRICING_TIERS, STEPS } from '@/utils/constants';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function Home() {
+export default async function Home() {
+  const supabase = getSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session) {
+    redirect('/dashboard');
+  }
+
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
