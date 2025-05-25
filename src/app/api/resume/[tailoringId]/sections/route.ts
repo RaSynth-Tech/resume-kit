@@ -43,3 +43,54 @@ export async function GET(
         return NextResponse.json({ success: false, error: 'Failed to get sections'}, { status: 500 });
     }
 }
+
+export async function PATCH(
+    request: Request,
+    { params }: { params: { tailoringId: string } }
+) {
+    try {
+        const supabase = getSupabaseServerClient();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError) throw sessionError;
+        if (!session) {
+            return NextResponse.json(
+                { success: false, error: 'Not authenticated' },
+                { status: 401 }
+            );
+        }
+
+        const body = await request.json();
+        const { type, content } = body;
+
+        if (!type || !content) {
+            return NextResponse.json(
+                { success: false, error: 'Missing required fields' },
+                { status: 400 }
+            );
+        }
+
+        // Update the section in the database
+        const { error: updateError } = await supabase
+            .from('resume_profiles')
+            .update(content)
+            .eq('tailoring_id', params.tailoringId)
+            .eq('id', content.id);
+
+        if (updateError) {
+            console.error('Update error:', updateError);
+            return NextResponse.json(
+                { success: false, error: 'Failed to update section' },
+                { status: 500 }
+            );
+        }
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('PATCH error:', error);
+        return NextResponse.json(
+            { success: false, error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}

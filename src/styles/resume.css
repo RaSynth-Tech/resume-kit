@@ -1,0 +1,34 @@
+/* Resume page break styles */
+@media print {
+  .resume-container {
+    page-break-after: always;
+  }
+
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  .resume-container:last-child {
+    page-break-after: avoid;
+  }
+}
+
+/* Ensure sections don't break awkwardly */
+section {
+  page-break-inside: auto;
+}
+
+/* Ensure headers stay with their content */
+h3 {
+  page-break-after: avoid;
+}
+
+/* Ensure lists don't break awkwardly */
+ul {
+  page-break-inside: avoid;
+}
+
+/* Ensure paragraphs don't break awkwardly */
+p {
+  page-break-inside: avoid;
+} 
