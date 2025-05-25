@@ -145,7 +145,7 @@ export default function ResumePreviewPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="bg-red-50 p-6 rounded-lg">
+        <div className="bg-red-50 p-6 rounded-lg shadow-sm">
           <p className="text-red-600">{error}</p>
         </div>
       </div>
@@ -162,55 +162,55 @@ export default function ResumePreviewPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-semibold text-gray-900">Resume Preview</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Bar */}
+      <div className="sticky top-0 bg-white shadow-sm z-10">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <button
-            onClick={() => router.push(`/resume/${id}`)}
-            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-            title="Go Back"
+            onClick={() => router.push('/dashboard')}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
+            title="Go to Dashboard"
           >
-            <FaArrowLeft className="w-5 h-5" />
+            <FaArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
           </button>
           <div className="flex items-center gap-4">
             {saveMessage && (
-              <span className={`text-sm ${saveMessage.includes('Failed') ? 'text-red-600' : 'text-green-600'}`}>
+              <span className={`text-sm font-medium ${saveMessage.includes('Failed') ? 'text-red-600' : 'text-green-600'}`}>
                 {saveMessage}
               </span>
             )}
-            {isEditing ? (
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className={`p-2 transition-colors ${
-                  isSaving 
-                    ? 'text-gray-400 cursor-not-allowed' 
-                    : 'text-green-600 hover:text-green-700'
-                }`}
-                title="Save Changes"
-              >
-                <FaSave className="w-5 h-5" />
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-                title="Edit Resume"
-              >
-                <FaEdit className="w-5 h-5" />
-              </button>
-            )}
+            <button
+              onClick={() => router.push(`/resume/${id}`)}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
+              title="Edit Resume"
+            >
+              <FaEdit className="w-4 h-4 mr-2" />
+              Edit Resume
+            </button>
             <button
               onClick={() => toPDF()}
-              className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
               title="Download PDF"
             >
-              <FaDownload className="w-5 h-5" />
+              <FaDownload className="w-4 h-4 mr-2" />
+              Download PDF
             </button>
           </div>
         </div>
       </div>
       
-      <div className="pt-16 pb-8">
+      <div className="py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="bg-white">

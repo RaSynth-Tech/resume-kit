@@ -38,9 +38,9 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900">My Resumes</h1>
           <Link
             href="/tailor"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1e40af] hover:bg-[#1e3a8a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1e40af]"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
           >
-            <FaPlus className="mr-2" />
+            <FaPlus className="w-4 h-4 mr-2" />
             Create New Resume
           </Link>
         </div>
@@ -53,9 +53,9 @@ export default async function DashboardPage() {
             <div className="mt-6">
               <Link
                 href="/tailor"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1e40af] hover:bg-[#1e3a8a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1e40af]"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
               >
-                <FaPlus className="mr-2" />
+                <FaPlus className="w-4 h-4 mr-2" />
                 Create New Resume
               </Link>
             </div>
@@ -75,17 +75,17 @@ export default async function DashboardPage() {
                     <div className="flex space-x-2">
                       <Link
                         href={`/resume/${resume.id}/preview`}
-                        className="p-2 text-gray-400 hover:text-[#1e40af] rounded-full hover:bg-gray-100"
+                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
                         title="Preview"
                       >
-                        <FaEye />
+                        <FaEye className="w-4 h-4" />
                       </Link>
                       <Link
                         href={`/resume/${resume.id}`}
-                        className="p-2 text-gray-400 hover:text-[#1e40af] rounded-full hover:bg-gray-100"
+                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
                         title="Edit"
                       >
-                        <FaEdit />
+                        <FaEdit className="w-4 h-4" />
                       </Link>
                       <form
                         action={async () => {
@@ -100,10 +100,10 @@ export default async function DashboardPage() {
                       >
                         <button
                           type="submit"
-                          className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                          className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
                           title="Delete"
                         >
-                          <FaTrash />
+                          <FaTrash className="w-4 h-4" />
                         </button>
                       </form>
                     </div>
