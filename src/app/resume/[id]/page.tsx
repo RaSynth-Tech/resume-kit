@@ -47,7 +47,19 @@ const sectionComponents = {
 export default function ResumeSectionEditor() {
   const router = useRouter();
   const params = useParams();
-  const [sections, setSections] = useState<Record<string, Section[]>>({});
+  const [sections, setSections] = useState<Record<string, Section[]>>({
+    profile: [],
+    experiences: [],
+    education: [],
+    certifications: [],
+    projects: [],
+    interests: [],
+    languages: [],
+    affiliations: [],
+    awards: [],
+    publications: [],
+    conferences: []
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,6 +103,21 @@ export default function ResumeSectionEditor() {
         if (!res.ok) throw new Error('Failed to fetch sections');
         const data: ApiResponse = await res.json();
 
+        // Initialize with empty arrays for all section types
+        const initialSections: Record<string, Section[]> = {
+          profile: [],
+          experiences: [],
+          education: [],
+          certifications: [],
+          projects: [],
+          interests: [],
+          languages: [],
+          affiliations: [],
+          awards: [],
+          publications: [],
+          conferences: []
+        };
+
         // Flatten the sections into a single array
         const flattenedSections: Section[] = Object.entries(data).flatMap(([type, sections]) =>
           sections.map(section => ({ ...section, type }))
@@ -107,7 +134,7 @@ export default function ResumeSectionEditor() {
           }
           acc[section.type].push(section);
           return acc;
-        }, {} as Record<string, Section[]>);
+        }, initialSections);
 
         // Order the sections in a generally expected way
         const orderedSectionTypes = [
@@ -125,18 +152,15 @@ export default function ResumeSectionEditor() {
         ];
 
         const orderedSections = orderedSectionTypes.reduce((acc, type) => {
-          if (groupedSections[type]) {
-            acc[type] = groupedSections[type];
-          }
+          acc[type] = groupedSections[type] || [];
           return acc;
         }, {} as Record<string, Section[]>);
 
         setSections(orderedSections);
-        console.log(orderedSections);
-        console.log(groupedSections);
+        
         // Set initial draft content if there are sections
         const firstType = Object.keys(orderedSections)[0];
-        if (firstType && orderedSections[firstType].length) {
+        if (firstType && orderedSections[firstType].length > 0) {
           setDraftContent(orderedSections[firstType][0].content);
         }
       } catch (err) {
@@ -186,37 +210,42 @@ export default function ResumeSectionEditor() {
     );
   }
 
-  const sectionTypes = Object.keys(sections);
-  const currentSectionType = Object.keys(sections)[currentIndex];
-  const current = sections[currentSectionType];
-  const CurrentSectionComponent = sectionComponents[current[0].type.toLowerCase() as keyof typeof sectionComponents];
+  const sectionTypes = Object.keys(sections).filter(type => sections[type].length > 0);
+  const currentSectionType = sectionTypes[currentIndex];
+  const current = sections[currentSectionType] || [];
+  const CurrentSectionComponent = current.length > 0 
+    ? sectionComponents[current[0].type.toLowerCase() as keyof typeof sectionComponents]
+    : null;
+
   return (
     <main className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-center space-x-3 overflow-x-auto mb-8">
-          {sectionTypes.map((type, idx) => (
-            <button
-              key={type}
-              onClick={() => goToIndex(idx)}
-              className={`
-                whitespace-nowrap
-                px-4 py-2
-                rounded-full
-                text-sm font-medium
-                transition-all duration-150
-                ${idx === currentIndex
-                  ? 'bg-blue-800 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
-              `}
-            >
-              {type.toUpperCase()}
-            </button>
-          ))}
-        </div>
+        {sectionTypes.length > 0 && (
+          <div className="flex justify-center space-x-3 overflow-x-auto mb-8">
+            {sectionTypes.map((type, idx) => (
+              <button
+                key={type}
+                onClick={() => goToIndex(idx)}
+                className={`
+                  whitespace-nowrap
+                  px-4 py-2
+                  rounded-full
+                  text-sm font-medium
+                  transition-all duration-150
+                  ${idx === currentIndex
+                    ? 'bg-blue-800 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                `}
+              >
+                {type.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 bg-white rounded-2xl shadow-xl p-8">
-            {CurrentSectionComponent && (
+            {CurrentSectionComponent && current.length > 0 && (
               <CurrentSectionComponent
                 data={current as any}
                 onChange={handleSectionChange}
@@ -240,7 +269,7 @@ export default function ResumeSectionEditor() {
                 onClick={handleNext}
                 className="px-5 py-2 bg-blue-800 text-white rounded-md text-sm font-medium hover:bg-blue-900"
               >
-                {currentIndex === Object.keys(sections).length - 1 ? 'Review' : 'Next'}
+                {currentIndex === sectionTypes.length - 1 ? 'Review' : 'Next'}
               </button>
             </div>
           </div>
