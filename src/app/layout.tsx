@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import '@/styles/globals.css';
-import ClientLayout from '@/components/layout/ClientLayout';
+import '@/app/globals.css';
+import Layout from '@/components/layout/Layout';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'ResumeKit - Tailor your resume instantly for any job',
-  description: 'AI-powered resume tailoring tool to help you land your dream job',
+  title: 'ResumeKit - Create Professional Resumes',
+  description: 'Create professional resumes tailored to your dream job with ResumeKit.',
 };
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ClientLayout>{children}</ClientLayout>
+        <Layout>{children}</Layout>
       </body>
     </html>
   );

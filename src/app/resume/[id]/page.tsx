@@ -229,12 +229,12 @@ export default function ResumeSectionEditor() {
                 className={`
                   whitespace-nowrap
                   px-4 py-2
-                  rounded-full
+                  rounded-md
                   text-sm font-medium
                   transition-all duration-150
                   ${idx === currentIndex
-                    ? 'bg-blue-800 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                    ? 'bg-white text-gray-900 border border-gray-300 shadow-sm'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}
                 `}
               >
                 {type.toUpperCase()}
@@ -257,17 +257,18 @@ export default function ResumeSectionEditor() {
                 onClick={handlePrevious}
                 disabled={currentIndex === 0}
                 className={`
-                  px-5 py-2 rounded-md text-sm font-medium
+                  inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md
+                  transition-colors duration-200
                   ${currentIndex === 0
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'}
+                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500'}
                 `}
               >
                 Previous
               </button>
               <button
                 onClick={handleNext}
-                className="px-5 py-2 bg-blue-800 text-white rounded-md text-sm font-medium hover:bg-blue-900"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
               >
                 {currentIndex === sectionTypes.length - 1 ? 'Review' : 'Next'}
               </button>

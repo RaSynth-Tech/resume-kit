@@ -40,7 +40,7 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
       <div className="flex justify-center">
         <button 
           onClick={handlePreview} 
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-300"
+          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
         >
           View Full Size
         </button>
