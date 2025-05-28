@@ -44,6 +44,10 @@ export interface Profile {
     start_date: string | null;
     end_date: string | null;
     description: string | null;
+    url: string | null;
+    github_url: string | null;
+    bullets: string[];
+    sort_index: number;
   }
   
   /* --------------------------------------------------------------------------

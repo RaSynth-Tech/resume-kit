@@ -1,25 +1,54 @@
-import React, { useState } from 'react';
-import { Projects } from './types';
+import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaChevronUp, FaProjectDiagram, FaCalendarAlt, FaLink, FaArrowUp, FaArrowDown, FaGithub } from 'react-icons/fa';
 import RichTextEditor from '@/components/common/RichTextEditor';
+import { useResumeStore } from '@/contexts/resume/resumeStore';
+import { Project } from '@/types/resume';
 
-interface ProjectsSectionProps {
-  data: Projects[];
-  onChange: (index: number, field: string, value: any) => void;
-}
-
-const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => {
+const ProjectsSection: React.FC = () => {
+  const { resumeData, updateProject } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  const [localProjects, setLocalProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    if (resumeData?.projects) {
+      setLocalProjects(resumeData.projects);
+    }
+  }, [resumeData?.projects]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
+  const handleInputChange = (index: number, field: string, value: any) => {
+    setLocalProjects(prev => {
+      const newProjects = [...prev];
+      newProjects[index] = {
+        ...newProjects[index],
+        [field]: value
+      };
+      return newProjects;
+    });
+    
+    // Update the global state
+    const project = localProjects[index];
+    if (project?.id) {
+      updateProject(project.id, { [field]: value });
+    }
+  };
+
+  if (!localProjects.length) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No projects added yet. Click the add button to create your first project.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {data.map((project, index) => (
+      {localProjects.map((project, index) => (
         <div 
-          key={index} 
+          key={project.id || index} 
           className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
         >
           {/* Accordion Header */}
@@ -43,7 +72,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onChange(index, 'sort_index', project.sort_index - 1);
+                    handleInputChange(index, 'sort_index', project.sort_index - 1);
                   }}
                   className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -52,7 +81,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onChange(index, 'sort_index', project.sort_index + 1);
+                    handleInputChange(index, 'sort_index', project.sort_index + 1);
                   }}
                   className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -76,7 +105,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                   <input
                     type="text"
                     value={project.name}
-                    onChange={(e) => onChange(index, 'name', e.target.value)}
+                    onChange={(e) => handleInputChange(index, 'name', e.target.value)}
                     className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     placeholder="Enter project name"
                   />
@@ -91,7 +120,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                     <input
                       type="date"
                       value={project.start_date || ''}
-                      onChange={(e) => onChange(index, 'start_date', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'start_date', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     />
                     <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -104,7 +133,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                     <input
                       type="date"
                       value={project.end_date || ''}
-                      onChange={(e) => onChange(index, 'end_date', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'end_date', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     />
                     <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -118,7 +147,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                   <input
                     type="url"
                     value={project.url || ''}
-                    onChange={(e) => onChange(index, 'url', e.target.value)}
+                    onChange={(e) => handleInputChange(index, 'url', e.target.value)}
                     className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     placeholder="Enter project URL"
                   />
@@ -132,7 +161,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                   <input
                     type="url"
                     value={project.github_url || ''}
-                    onChange={(e) => onChange(index, 'github_url', e.target.value)}
+                    onChange={(e) => handleInputChange(index, 'github_url', e.target.value)}
                     className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     placeholder="Enter GitHub repository URL"
                   />
@@ -145,7 +174,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                 <div className="relative">
                   <RichTextEditor
                     value={project.description || ''}
-                    onChange={(value) => onChange(index, 'description', value)}
+                    onChange={(value) => handleInputChange(index, 'description', value)}
                   />
                 </div>
               </div>
@@ -155,7 +184,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, onChange }) => 
                 <div className="relative">
                   <RichTextEditor
                     value={(project.bullets || []).join('\n')}
-                    onChange={(value) => onChange(index, 'bullets', value.split('\n'))}
+                    onChange={(value) => handleInputChange(index, 'bullets', value.split('\n'))}
                   />
                 </div>
               </div>
