@@ -35,9 +35,11 @@ export interface Profile {
   export interface Certification { 
     id: string;
     name: string;
+    issuer: string | null;
     start_date: string | null;
     end_date: string | null;
     description: string | null;
+    sort_index: number;
   }
   export interface Project { 
     id: string;
