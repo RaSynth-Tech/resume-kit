@@ -1,25 +1,56 @@
-import React, { useState } from 'react';
-import { Experience } from './types';
+import React, { useState, useEffect } from 'react';
+import { Database } from '@/types/supabase';
 import { FaChevronDown, FaChevronUp, FaBuilding, FaBriefcase, FaCalendarAlt, FaListUl, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import RichTextEditor from '@/components/common/RichTextEditor';
+import { useResumeStore } from '@/contexts/resume/resumeStore';
 
-interface ExperienceSectionProps {
-  data: Experience[];
-  onChange: (index: number, field: string, value: any) => void;
-}
+type Experience = Database['public']['Tables']['experiences']['Row'];
 
-const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange }) => {
+const ExperienceSection: React.FC = () => {
+  const { resumeData, updateExperience } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  const [localExperiences, setLocalExperiences] = useState<Experience[]>([]);
+
+  useEffect(() => {
+    if (resumeData?.experiences) {
+      setLocalExperiences(resumeData.experiences as Experience[]);
+    }
+  }, [resumeData?.experiences]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
+  const handleInputChange = (index: number, field: string, value: any) => {
+    setLocalExperiences(prev => {
+      const newExperiences = [...prev];
+      newExperiences[index] = {
+        ...newExperiences[index],
+        [field]: value
+      };
+      return newExperiences;
+    });
+    
+    // Update the global state
+    const experience = localExperiences[index];
+    if (experience?.id) {
+      updateExperience(experience.id, { [field]: value });
+    }
+  };
+
+  if (!localExperiences.length) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No experiences added yet. Click the add button to create your first experience.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {data.map((experience, index) => (
+      {localExperiences.map((experience, index) => (
         <div 
-          key={index} 
+          key={experience.id || index} 
           className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
         >
           {/* Accordion Header */}
@@ -43,7 +74,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange })
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onChange(index, 'sort_index', experience.sort_index - 1);
+                    handleInputChange(index, 'sort_index', experience.sort_index - 1);
                   }}
                   className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -52,7 +83,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange })
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onChange(index, 'sort_index', experience.sort_index + 1);
+                    handleInputChange(index, 'sort_index', experience.sort_index + 1);
                   }}
                   className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -77,7 +108,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange })
                     <input
                       type="text"
                       value={experience.company}
-                      onChange={(e) => onChange(index, 'company', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'company', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                       placeholder="Enter company name"
                     />
@@ -91,7 +122,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange })
                     <input
                       type="text"
                       value={experience.title}
-                      onChange={(e) => onChange(index, 'title', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'title', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                       placeholder="Enter position title"
                     />
@@ -106,8 +137,8 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange })
                   <div className="relative">
                     <input
                       type="date"
-                      value={experience.start_date}
-                      onChange={(e) => onChange(index, 'start_date', e.target.value)}
+                      value={experience.start_date || ''}
+                      onChange={(e) => handleInputChange(index, 'start_date', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     />
                     <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -120,7 +151,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange })
                     <input
                       type="date"
                       value={experience.end_date || ''}
-                      onChange={(e) => onChange(index, 'end_date', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'end_date', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     />
                     <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -132,8 +163,8 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, onChange })
                 <label className="block text-sm font-medium text-gray-700">Responsibilities & Achievements</label>
                 <div className="relative">
                   <RichTextEditor
-                    value={experience.bullets.join('\n')}
-                    onChange={(value) => onChange(index, 'bullets', value.split('\n'))}
+                    value={(experience.bullets || []).join('\n')}
+                    onChange={(value) => handleInputChange(index, 'bullets', value.split('\n'))}
                   />
                 </div>
               </div>

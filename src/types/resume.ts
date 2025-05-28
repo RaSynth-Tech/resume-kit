@@ -25,11 +25,12 @@ export interface Profile {
   
   export interface Education { 
     id: string;
-    school: string;
+    institution: string;
     degree: string;
     start_date: string | null;
     end_date: string | null;
     description: string | null;
+    sort_index: number;
   }
   export interface Certification { 
     id: string;
