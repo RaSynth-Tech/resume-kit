@@ -50,48 +50,56 @@ export default function ResumeSectionEditor() {
   const params = useParams();
   const [sections, setSections] = useState<ResumeData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [draftContent, setDraftContent] = useState('');
 
   const id = params?.id as string;
+  const { resumeData, updateProfile, updateExperience, updateEducation, updateCertification, updateProject, fetchResume, loading } = useResumeStore();
 
   const handleSectionChange = (fieldOrIndex: string | number, valueOrField?: any, value?: any) => {
-    // setSections(prevSections => {
-    //   const updatedSections = { ...prevSections };
-    //   const currentSectionType = Object.keys(prevSections)[currentIndex];
-
-    //   // if (!updatedSections[currentSectionType]) {
-    //   //   return prevSections;
-    //   // }
-
-    //   // Handle both function signatures
-    //   const field = typeof fieldOrIndex === 'number' ? valueOrField : fieldOrIndex;
-    //   const newValue = typeof fieldOrIndex === 'number' ? value : valueOrField;
-    //   const index = typeof fieldOrIndex === 'number' ? fieldOrIndex : 0;
-
-    //   // Update the specific section at the given index
-    //   const updatedSectionArray = [...updatedSections[currentSectionType]];
-    //   updatedSectionArray[index] = {
-    //     ...updatedSectionArray[index],
-    //     [field]: newValue
-    //   };
-
-    //   updatedSections[currentSectionType] = updatedSectionArray;
-    //   return updatedSections;
-    // });
+    if (!resumeData) return;
+  
+    const currentSectionType = Object.keys(resumeData)[currentIndex];
+    const field = typeof fieldOrIndex === 'number' ? valueOrField : fieldOrIndex;
+    const newValue = typeof fieldOrIndex === 'number' ? value : valueOrField;
+    const index = typeof fieldOrIndex === 'number' ? fieldOrIndex : 0;
+  
+    // Update based on section type
+    switch (currentSectionType) {
+      case 'profile':
+        updateProfile({
+          ...resumeData.profile[0],
+          [field]: newValue
+        });
+        break;
+      case 'experiences':
+        updateExperience(resumeData.experiences[index].id, {
+          [field]: newValue
+        });
+        break;
+      case 'education':
+        updateEducation(resumeData.education[index].id, {
+          [field]: newValue
+        });
+        break;
+      case 'certifications':
+        updateCertification(resumeData.certifications[index].id, {
+          [field]: newValue
+        });
+        break;
+      case 'projects':
+        updateProject(resumeData.projects[index].id, {
+          [field]: newValue
+        });
+        break;
+    }
   };
-
-  console.log("sections");
-  const { fetchResume, loading, resumeData } = useResumeStore();
 
   useEffect(() => {
     fetchResume(id);
   }, [fetchResume, id]);
 
   useEffect(() => {
-    console.log("sections");
-    console.log(resumeData);
     setSections(resumeData);
   }, [resumeData]);
 

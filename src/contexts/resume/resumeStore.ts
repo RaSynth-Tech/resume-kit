@@ -50,12 +50,21 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
     setError: (error) => set({ error }),
 
     // Profile actions
-    updateProfile: (profile) => set((state) => ({
-        resumeData: state.resumeData ? {
-            ...state.resumeData,
-            profile: [profile]
-        } : null
-    })),
+    updateProfile: (profile) => {
+        set((state) => {
+            if (!state.resumeData) return state;
+            const currentProfile = state.resumeData.profile[0];
+            return {
+                resumeData: {
+                    ...state.resumeData,
+                    profile: [{
+                        ...currentProfile,
+                        ...profile
+                    }]
+                }
+            };
+        });
+    },
 
     // Experience actions
     addExperience: (experience) => set((state) => ({

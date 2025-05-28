@@ -1,18 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ResumeProfile } from './types';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGithub, FaLinkedin, FaGlobe, FaInfoCircle } from 'react-icons/fa';
 import RichTextEditor from '@/components/common/RichTextEditor';
 
 interface ResumeProfileSectionProps {
   data: ResumeProfile[];
-  onChange: (field: string, value: any) => void;
+  onChange: (field: string, value: any, id: string) => void;
 }
 
 const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onChange }) => {
-  // data = data[0];
-  
   const resumeProfile = data[0];
-  console.log(data,"data");
+  const [localProfile, setLocalProfile] = useState(resumeProfile);
+
+  useEffect(() => {
+    setLocalProfile(resumeProfile);
+  }, [resumeProfile]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setLocalProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    onChange(field, value, resumeProfile.id);
+  };
+
   return (
     <div className="p-4 flex flex-col md:flex-row gap-4">
       <div className="flex-1">
@@ -20,8 +31,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           <FaUser className="mr-2 text-[#1e40af]" />
           <input
             type="text"
-            value={resumeProfile.full_name}
-            onChange={(e) => onChange('full_name', e.target.value)}
+            value={localProfile.full_name}
+            onChange={(e) => handleInputChange('full_name', e.target.value)}
             className="w-full md:w-3/4 p-2 border rounded"
             placeholder="Full Name"
           />
@@ -30,8 +41,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           <FaEnvelope className="mr-2 text-[#1e40af]" />
           <input
             type="email"
-            value={resumeProfile.email}
-            onChange={(e) => onChange('email', e.target.value)}
+            value={localProfile.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
             className="w-full md:w-3/4 p-2 border rounded"
             placeholder="Email"
           />
@@ -40,8 +51,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           <FaPhone className="mr-2 text-[#1e40af]" />
           <input
             type="text"
-            value={resumeProfile.phone || ''}
-            onChange={(e) => onChange('phone', e.target.value)}
+            value={localProfile.phone || ''}
+            onChange={(e) => handleInputChange('phone', e.target.value)}
             className="w-full md:w-3/4 p-2 border rounded"
             placeholder="Phone"
           />
@@ -50,8 +61,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           <FaMapMarkerAlt className="mr-2 text-[#1e40af]" />
           <input
             type="text"
-            value={resumeProfile.location || ''}
-            onChange={(e) => onChange('location', e.target.value)}
+            value={localProfile.location || ''}
+            onChange={(e) => handleInputChange('location', e.target.value)}
             className="w-full md:w-3/4 p-2 border rounded"
             placeholder="Location"
           />
@@ -60,8 +71,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           <FaGithub className="mr-2 text-[#1e40af]" />
           <input
             type="text"
-            value={resumeProfile.github_url || ''}
-            onChange={(e) => onChange('github_url', e.target.value)}
+            value={localProfile.github_url || ''}
+            onChange={(e) => handleInputChange('github_url', e.target.value)}
             className="w-full md:w-3/4 p-2 border rounded"
             placeholder="GitHub URL"
           />
@@ -70,8 +81,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           <FaLinkedin className="mr-2 text-[#1e40af]" />
           <input
             type="text"
-            value={resumeProfile.linkedin_url || ''}
-            onChange={(e) => onChange('linkedin_url', e.target.value)}
+            value={localProfile.linkedin_url || ''}
+            onChange={(e) => handleInputChange('linkedin_url', e.target.value)}
             className="w-full md:w-3/4 p-2 border rounded"
             placeholder="LinkedIn URL"
           />
@@ -80,8 +91,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
           <FaGlobe className="mr-2 text-[#1e40af]" />
           <input
             type="text"
-            value={resumeProfile.website_url || ''}
-            onChange={(e) => onChange('website_url', e.target.value)}
+            value={localProfile.website_url || ''}
+            onChange={(e) => handleInputChange('website_url', e.target.value)}
             className="w-full md:w-3/4 p-2 border rounded"
             placeholder="Website URL"
           />
@@ -90,8 +101,8 @@ const ResumeProfileSection: React.FC<ResumeProfileSectionProps> = ({ data, onCha
       <div className="flex-1">
         <label htmlFor="aboutMe" className="block text-md font-bold font-medium text-[#1e40af] mb-1">ABOUT ME</label>
         <RichTextEditor
-          value={resumeProfile.about_me || ''}
-          onChange={(value) => onChange('about_me', value)}
+          value={localProfile.about_me || ''}
+          onChange={(value) => handleInputChange('about_me', value)}
         />
       </div>
     </div>
