@@ -5,15 +5,17 @@ import RichTextEditor from '@/components/common/RichTextEditor';
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const CertificationsSection: React.FC = () => {
-  const { resumeData, updateCertification } = useResumeStore();
+  const { resumeData, updateCertification, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localCertifications, setLocalCertifications] = useState<Certification[]>([]);
 
   useEffect(() => {
-    if (resumeData?.certifications) {
-      setLocalCertifications(resumeData.certifications);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.certifications) {
+      setLocalCertifications(resumeData[currentResumeId].certifications);
+    } else {
+      setLocalCertifications([]); // Clear if no current resume or certifications
     }
-  }, [resumeData?.certifications]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

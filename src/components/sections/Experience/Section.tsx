@@ -7,15 +7,17 @@ import { useResumeStore } from '@/contexts/resume/resumeStore';
 type Experience = Database['public']['Tables']['experiences']['Row'];
 
 const ExperienceSection: React.FC = () => {
-  const { resumeData, updateExperience } = useResumeStore();
+  const { resumeData, updateExperience, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localExperiences, setLocalExperiences] = useState<Experience[]>([]);
 
   useEffect(() => {
-    if (resumeData?.experiences) {
-      setLocalExperiences(resumeData.experiences as Experience[]);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.experiences) {
+      setLocalExperiences(resumeData[currentResumeId].experiences as Experience[]);
+    } else {
+      setLocalExperiences([]); // Clear if no current resume or experiences
     }
-  }, [resumeData?.experiences]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

@@ -4,15 +4,17 @@ import { FaChevronDown, FaChevronUp, FaHeart, FaArrowUp, FaArrowDown } from 'rea
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const InterestsSection: React.FC = () => {
-  const { resumeData, updateInterest } = useResumeStore();
+  const { resumeData, updateInterest, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localInterests, setLocalInterests] = useState<Interests[]>([]);
 
   useEffect(() => {
-    if (resumeData?.interests) {
-      setLocalInterests(resumeData.interests);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.interests) {
+      setLocalInterests(resumeData[currentResumeId].interests);
+    } else {
+      setLocalInterests([]); // Clear if no current resume or interests
     }
-  }, [resumeData?.interests]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

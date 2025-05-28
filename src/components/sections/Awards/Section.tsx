@@ -4,15 +4,17 @@ import { FaChevronDown, FaChevronUp, FaTrophy, FaBuilding, FaCalendarAlt, FaArro
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const AwardsSection: React.FC = () => {
-  const { resumeData, updateAward } = useResumeStore();
+  const { resumeData, updateAward, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localAwards, setLocalAwards] = useState<Awards[]>([]);
 
   useEffect(() => {
-    if (resumeData?.awards) {
-      setLocalAwards(resumeData.awards);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.awards) {
+      setLocalAwards(resumeData[currentResumeId].awards);
+    } else {
+      setLocalAwards([]); // Clear if no current resume or awards
     }
-  }, [resumeData?.awards]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

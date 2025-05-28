@@ -4,15 +4,17 @@ import { FaChevronDown, FaChevronUp, FaBook, FaUsers, FaCalendarAlt, FaArrowUp, 
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const PublicationsSection: React.FC = () => {
-  const { resumeData, updatePublication } = useResumeStore();
+  const { resumeData, updatePublication, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localPublications, setLocalPublications] = useState<Publications[]>([]);
 
   useEffect(() => {
-    if (resumeData?.publications) {
-      setLocalPublications(resumeData.publications);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.publications) {
+      setLocalPublications(resumeData[currentResumeId].publications);
+    } else {
+      setLocalPublications([]); // Clear if no current resume or publications
     }
-  }, [resumeData?.publications]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

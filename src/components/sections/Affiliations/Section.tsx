@@ -4,15 +4,17 @@ import { FaChevronDown, FaChevronUp, FaBuilding, FaUserTie, FaCalendarAlt, FaArr
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const AffiliationsSection: React.FC = () => {
-  const { resumeData, updateAffiliation } = useResumeStore();
+  const { resumeData, updateAffiliation, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localAffiliations, setLocalAffiliations] = useState<Affiliations[]>([]);
 
   useEffect(() => {
-    if (resumeData?.affiliations) {
-      setLocalAffiliations(resumeData.affiliations);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.affiliations) {
+      setLocalAffiliations(resumeData[currentResumeId].affiliations);
+    } else {
+      setLocalAffiliations([]); // Clear if no current resume or affiliations
     }
-  }, [resumeData?.affiliations]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

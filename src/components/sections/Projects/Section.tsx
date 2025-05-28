@@ -5,15 +5,17 @@ import { useResumeStore } from '@/contexts/resume/resumeStore';
 import { Project } from '@/types/resume';
 
 const ProjectsSection: React.FC = () => {
-  const { resumeData, updateProject } = useResumeStore();
+  const { resumeData, updateProject, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localProjects, setLocalProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    if (resumeData?.projects) {
-      setLocalProjects(resumeData.projects);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.projects) {
+      setLocalProjects(resumeData[currentResumeId].projects);
+    } else {
+      setLocalProjects([]); // Clear if no current resume or projects
     }
-  }, [resumeData?.projects]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

@@ -4,15 +4,17 @@ import { FaChevronDown, FaChevronUp, FaLanguage, FaArrowUp, FaArrowDown } from '
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const LanguagesSection: React.FC = () => {
-  const { resumeData, updateLanguage } = useResumeStore();
+  const { resumeData, updateLanguage, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localLanguages, setLocalLanguages] = useState<Languages[]>([]);
 
   useEffect(() => {
-    if (resumeData?.languages) {
-      setLocalLanguages(resumeData.languages);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.languages) {
+      setLocalLanguages(resumeData[currentResumeId].languages);
+    } else {
+      setLocalLanguages([]); // Clear if no current resume or languages
     }
-  }, [resumeData?.languages]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

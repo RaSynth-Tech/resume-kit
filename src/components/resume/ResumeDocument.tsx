@@ -204,7 +204,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
               <div key={edu.id} className="text-[12px] page-break-inside-avoid">
                 <div className="flex justify-between font-medium">
                   <span>
-                    {edu.degree} – {edu.school}
+                    {edu.degree} – {edu.institution}
                   </span>
                   <span className="shrink-0">
                     {formatDate(edu.start_date, edu.end_date)}

@@ -4,16 +4,18 @@ import { FaChevronDown, FaChevronUp, FaUniversity, FaGraduationCap, FaCalendarAl
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const EducationSection: React.FC = () => {
-  const { resumeData, updateEducation } = useResumeStore();
+  const { resumeData, updateEducation, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localEducation, setLocalEducation] = useState<Education[]>([]);
 
   useEffect(() => {
-    if (resumeData?.education) {
-      setLocalEducation(resumeData.education);
-      console.log(resumeData.education);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.education) {
+      setLocalEducation(resumeData[currentResumeId].education);
+      console.log(resumeData[currentResumeId].education);
+    } else {
+      setLocalEducation([]);
     }
-  }, [resumeData?.education]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

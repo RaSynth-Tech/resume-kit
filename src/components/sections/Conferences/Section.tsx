@@ -4,15 +4,17 @@ import { FaChevronDown, FaChevronUp, FaUsers, FaUserTie, FaCalendarAlt, FaArrowU
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 
 const ConferencesSection: React.FC = () => {
-  const { resumeData, updateConference } = useResumeStore();
+  const { resumeData, updateConference, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [localConferences, setLocalConferences] = useState<Conferences[]>([]);
 
   useEffect(() => {
-    if (resumeData?.conferences) {
-      setLocalConferences(resumeData.conferences);
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.conferences) {
+      setLocalConferences(resumeData[currentResumeId].conferences);
+    } else {
+      setLocalConferences([]); // Clear if no current resume or conferences
     }
-  }, [resumeData?.conferences]);
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
