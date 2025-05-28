@@ -18,6 +18,7 @@ import {
 import ResumePreview from '@/components/resume/ResumePreview';
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 import { ResumeData } from '@/types/resume';
+
 interface Section {
   id: string;
   type: string;
@@ -57,9 +58,9 @@ export default function ResumeSectionEditor() {
   const { resumeData, updateProfile, updateExperience, updateEducation, updateCertification, updateProject, fetchResume, loading } = useResumeStore();
 
   const handleSectionChange = (fieldOrIndex: string | number, valueOrField?: any, value?: any) => {
-    if (!resumeData) return;
+    if (!resumeData || !id) return;
   
-    const currentSectionType = Object.keys(resumeData)[currentIndex];
+    const currentSectionType = Object.keys(resumeData[id])[currentIndex];
     const field = typeof fieldOrIndex === 'number' ? valueOrField : fieldOrIndex;
     const newValue = typeof fieldOrIndex === 'number' ? value : valueOrField;
     const index = typeof fieldOrIndex === 'number' ? fieldOrIndex : 0;
@@ -68,27 +69,27 @@ export default function ResumeSectionEditor() {
     switch (currentSectionType) {
       case 'profile':
         updateProfile({
-          ...resumeData.profile[0],
+          ...resumeData[id].profile[0],
           [field]: newValue
         });
         break;
       case 'experiences':
-        updateExperience(resumeData.experiences[index].id, {
+        updateExperience(resumeData[id].experiences[index].id, {
           [field]: newValue
         });
         break;
       case 'education':
-        updateEducation(resumeData.education[index].id, {
+        updateEducation(resumeData[id].education[index].id, {
           [field]: newValue
         });
         break;
       case 'certifications':
-        updateCertification(resumeData.certifications[index].id, {
+        updateCertification(resumeData[id].certifications[index].id, {
           [field]: newValue
         });
         break;
       case 'projects':
-        updateProject(resumeData.projects[index].id, {
+        updateProject(resumeData[id].projects[index].id, {
           [field]: newValue
         });
         break;
@@ -96,12 +97,18 @@ export default function ResumeSectionEditor() {
   };
 
   useEffect(() => {
-    fetchResume(id);
-  }, [fetchResume, id]);
+    if (id) {
+      if (!resumeData?.[id]) {
+        fetchResume(id);
+      }
+    }
+  }, [id, fetchResume, resumeData]);
 
   useEffect(() => {
-    setSections(resumeData);
-  }, [resumeData]);
+    if (resumeData && id) {
+      setSections(resumeData[id]);
+    }
+  }, [resumeData, id]);
 
   const handlePrevious = () => currentIndex > 0 && setCurrentIndex(currentIndex - 1);
   const handleNext = () => {

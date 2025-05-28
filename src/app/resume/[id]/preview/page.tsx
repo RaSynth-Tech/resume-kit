@@ -21,18 +21,20 @@ export default function ResumePreviewPage() {
 
   useEffect(() => {
     if (id) {
-      fetchResume(id);
+      if (!resumeData?.[id]) {
+        fetchResume(id);
+      }
     }
-  }, [id, fetchResume]);
+  }, [id, fetchResume, resumeData]);
 
   const handleEdit = async (field: string, value: any) => {
-    if (!resumeData) return;
+    if (!resumeData || !id) return;
 
     try {
       if (field.startsWith('profile.')) {
         const profileField = field.split('.')[1];
         const updatedProfile = {
-          ...resumeData.profile[0],
+          ...resumeData[id].profile[0],
           [profileField]: value
         };
         updateProfile(updatedProfile);
@@ -43,13 +45,13 @@ export default function ResumePreviewPage() {
   };
 
   const handleSave = async () => {
-    if (!resumeData) return;
+    if (!resumeData || !id) return;
 
     try {
       setIsSaving(true);
       setSaveMessage(null);
 
-      if (!resumeData.profile[0]?.id) {
+      if (!resumeData[id].profile[0]?.id) {
         throw new Error('Profile ID is missing');
       }
 
@@ -61,7 +63,7 @@ export default function ResumePreviewPage() {
         body: JSON.stringify({
           type: 'profile',
           content: {
-            ...resumeData.profile[0],
+            ...resumeData[id].profile[0],
             tailoring_id: id
           }
         }),
@@ -149,7 +151,7 @@ export default function ResumePreviewPage() {
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <ResumeView 
             ref={targetRef} 
-            data={resumeData} 
+            data={resumeData[id]} 
             isEditing={isEditing}
             onEdit={handleEdit}
           />
