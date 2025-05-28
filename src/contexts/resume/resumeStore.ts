@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ResumeData, Profile, Experience, Education, Certification, Project, ApiResponse, Section } from '@/types/resume';
+import { ResumeData, Profile, Experience, Education, Certification, Project, Affiliations, Awards, Conferences, Interests, Languages, Publications, ApiResponse, Section } from '@/types/resume';
 
 interface ResumeState {
     // Resume data
@@ -34,6 +34,36 @@ interface ResumeState {
     addProject: (project: Project) => void;
     updateProject: (id: string, project: Partial<Project>) => void;
     removeProject: (id: string) => void;
+
+    // Affiliation actions
+    addAffiliation: (affiliation: Affiliations) => void;
+    updateAffiliation: (id: string, affiliation: Partial<Affiliations>) => void;
+    removeAffiliation: (id: string) => void;
+
+    // Award actions
+    addAward: (award: Awards) => void;
+    updateAward: (id: string, award: Partial<Awards>) => void;
+    removeAward: (id: string) => void;
+
+    // Conference actions
+    addConference: (conference: Conferences) => void;
+    updateConference: (id: string, conference: Partial<Conferences>) => void;
+    removeConference: (id: string) => void;
+
+    // Interest actions
+    addInterest: (interest: Interests) => void;
+    updateInterest: (id: string, interest: Partial<Interests>) => void;
+    removeInterest: (id: string) => void;
+
+    // Language actions
+    addLanguage: (language: Languages) => void;
+    updateLanguage: (id: string, language: Partial<Languages>) => void;
+    removeLanguage: (id: string) => void;
+
+    // Publication actions
+    addPublication: (publication: Publications) => void;
+    updatePublication: (id: string, publication: Partial<Publications>) => void;
+    removePublication: (id: string) => void;
 
     // API actions
     fetchResume: (id: string) => Promise<void>;
@@ -151,6 +181,138 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
         resumeData: state.resumeData ? {
             ...state.resumeData,
             projects: state.resumeData.projects.filter(proj => proj.id !== id)
+        } : null
+    })),
+
+    // Affiliation actions
+    addAffiliation: (affiliation) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            affiliations: [...state.resumeData.affiliations, affiliation]
+        } : null
+    })),
+    updateAffiliation: (id, affiliation) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            affiliations: state.resumeData.affiliations.map(aff =>
+                aff.id === id ? { ...aff, ...affiliation } : aff
+            )
+        } : null
+    })),
+    removeAffiliation: (id) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            affiliations: state.resumeData.affiliations.filter(aff => aff.id !== id)
+        } : null
+    })),
+
+    // Award actions
+    addAward: (award) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            awards: [...state.resumeData.awards, award]
+        } : null
+    })),
+    updateAward: (id, award) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            awards: state.resumeData.awards.map(a =>
+                a.id === id ? { ...a, ...award } : a
+            )
+        } : null
+    })),
+    removeAward: (id) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            awards: state.resumeData.awards.filter(a => a.id !== id)
+        } : null
+    })),
+
+    // Conference actions
+    addConference: (conference) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            conferences: [...state.resumeData.conferences, conference]
+        } : null
+    })),
+    updateConference: (id, conference) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            conferences: state.resumeData.conferences.map(c =>
+                c.id === id ? { ...c, ...conference } : c
+            )
+        } : null
+    })),
+    removeConference: (id) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            conferences: state.resumeData.conferences.filter(c => c.id !== id)
+        } : null
+    })),
+
+    // Interest actions
+    addInterest: (interest) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            interests: [...state.resumeData.interests, interest]
+        } : null
+    })),
+    updateInterest: (id, interest) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            interests: state.resumeData.interests.map(i =>
+                i.id === id ? { ...i, ...interest } : i
+            )
+        } : null
+    })),
+    removeInterest: (id) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            interests: state.resumeData.interests.filter(i => i.id !== id)
+        } : null
+    })),
+
+    // Language actions
+    addLanguage: (language) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            languages: [...state.resumeData.languages, language]
+        } : null
+    })),
+    updateLanguage: (id, language) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            languages: state.resumeData.languages.map(l =>
+                l.id === id ? { ...l, ...language } : l
+            )
+        } : null
+    })),
+    removeLanguage: (id) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            languages: state.resumeData.languages.filter(l => l.id !== id)
+        } : null
+    })),
+
+    // Publication actions
+    addPublication: (publication) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            publications: [...state.resumeData.publications, publication]
+        } : null
+    })),
+    updatePublication: (id, publication) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            publications: state.resumeData.publications.map(p =>
+                p.id === id ? { ...p, ...publication } : p
+            )
+        } : null
+    })),
+    removePublication: (id) => set((state) => ({
+        resumeData: state.resumeData ? {
+            ...state.resumeData,
+            publications: state.resumeData.publications.filter(p => p.id !== id)
         } : null
     })),
 
