@@ -57,3 +57,14 @@ export interface Profile {
     projects:       Project[];
   }
   
+
+  export interface Section {
+    id: string;
+    type: string;
+    content: string;
+    sort_index: number;
+  }
+  
+  export interface ApiResponse {
+    [key: string]: Section[];
+  }

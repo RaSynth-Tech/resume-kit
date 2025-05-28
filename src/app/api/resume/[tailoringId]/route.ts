@@ -22,7 +22,7 @@ export async function GET(
         // Fetch data from each table
         type TableName = 'affiliations'| 'skills' | 'awards' | 'certifications' | 'conferences' | 'education' | 'experiences' | 'interests' | 'languages' | 'projects' | 'publications' | 'resume_profiles';
         const tables: TableName[] = ['affiliations', 'skills', 'awards', 'certifications', 'conferences', 'education', 'experiences', 'interests', 'languages', 'projects', 'publications', 'resume_profiles'];
-        const sections: Record<string, any[]> = {};
+        const sections = [];
 
         for (const table of tables) {
             const { data, error } = await supabase
@@ -34,7 +34,13 @@ export async function GET(
                 return NextResponse.json({ error: error.message }, { status: 500 });
             }
             if (data) {
-                sections[table] = data;
+                for (const item of data) {
+                    sections.push({
+                        section_title: table,
+                        ...item
+                    });
+                }
+
             }
         }
 

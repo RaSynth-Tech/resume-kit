@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth/AuthContext';
+import { useAuthStore } from '@/contexts/auth/authStore';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
 
   return (
     <nav className="bg-white border-b border-gray-200">

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/lib/auth/AuthContext';
+import { useAuthStore } from '@/contexts/auth/authStore';
 import Link from 'next/link';
 
 export default function LoginForm() {
-  const { login, loading, error } = useAuth();
+  const { login, loading, error } = useAuthStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',

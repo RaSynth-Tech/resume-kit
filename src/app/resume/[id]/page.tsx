@@ -16,7 +16,8 @@ import {
   ResumeProfileSection,
 } from '@/components/sections';
 import ResumePreview from '@/components/resume/ResumePreview';
-
+import { useResumeStore } from '@/contexts/resume/resumeStore';
+import { ResumeData } from '@/types/resume';
 interface Section {
   id: string;
   type: string;
@@ -47,144 +48,62 @@ const sectionComponents = {
 export default function ResumeSectionEditor() {
   const router = useRouter();
   const params = useParams();
-  const [sections, setSections] = useState<Record<string, Section[]>>({
-    profile: [],
-    experiences: [],
-    education: [],
-    certifications: [],
-    projects: [],
-    interests: [],
-    languages: [],
-    affiliations: [],
-    awards: [],
-    publications: [],
-    conferences: []
-  });
+  const [sections, setSections] = useState<ResumeData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [draftContent, setDraftContent] = useState('');
 
   const id = params?.id as string;
 
   const handleSectionChange = (fieldOrIndex: string | number, valueOrField?: any, value?: any) => {
-    setSections(prevSections => {
-      const updatedSections = { ...prevSections };
-      const currentSectionType = Object.keys(prevSections)[currentIndex];
-      
-      if (!updatedSections[currentSectionType]) {
-        return prevSections;
-      }
+    // setSections(prevSections => {
+    //   const updatedSections = { ...prevSections };
+    //   const currentSectionType = Object.keys(prevSections)[currentIndex];
 
-      // Handle both function signatures
-      const field = typeof fieldOrIndex === 'number' ? valueOrField : fieldOrIndex;
-      const newValue = typeof fieldOrIndex === 'number' ? value : valueOrField;
-      const index = typeof fieldOrIndex === 'number' ? fieldOrIndex : 0;
+    //   // if (!updatedSections[currentSectionType]) {
+    //   //   return prevSections;
+    //   // }
 
-      // Update the specific section at the given index
-      const updatedSectionArray = [...updatedSections[currentSectionType]];
-      updatedSectionArray[index] = {
-        ...updatedSectionArray[index],
-        [field]: newValue
-      };
+    //   // Handle both function signatures
+    //   const field = typeof fieldOrIndex === 'number' ? valueOrField : fieldOrIndex;
+    //   const newValue = typeof fieldOrIndex === 'number' ? value : valueOrField;
+    //   const index = typeof fieldOrIndex === 'number' ? fieldOrIndex : 0;
 
-      updatedSections[currentSectionType] = updatedSectionArray;
-      return updatedSections;
-    });
+    //   // Update the specific section at the given index
+    //   const updatedSectionArray = [...updatedSections[currentSectionType]];
+    //   updatedSectionArray[index] = {
+    //     ...updatedSectionArray[index],
+    //     [field]: newValue
+    //   };
+
+    //   updatedSections[currentSectionType] = updatedSectionArray;
+    //   return updatedSections;
+    // });
   };
+
+  console.log("sections");
+  const { fetchResume, loading, resumeData } = useResumeStore();
 
   useEffect(() => {
-    const fetchSections = async () => {
-      if (!id) return;
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/resume/${id}/sections`);
-        if (!res.ok) throw new Error('Failed to fetch sections');
-        const data: ApiResponse = await res.json();
+    fetchResume(id);
+  }, [fetchResume, id]);
 
-        // Initialize with empty arrays for all section types
-        const initialSections: Record<string, Section[]> = {
-          profile: [],
-          experiences: [],
-          education: [],
-          certifications: [],
-          projects: [],
-          interests: [],
-          languages: [],
-          affiliations: [],
-          awards: [],
-          publications: [],
-          conferences: []
-        };
+  useEffect(() => {
+    console.log("sections");
+    console.log(resumeData);
+    setSections(resumeData);
+  }, [resumeData]);
 
-        // Flatten the sections into a single array
-        const flattenedSections: Section[] = Object.entries(data).flatMap(([type, sections]) =>
-          sections.map(section => ({ ...section, type }))
-        );
-
-        // Group sections by type
-        const updatedSections = flattenedSections.map(section => ({
-          ...section,
-          type: section.type === 'resume_profiles' ? 'profile' : section.type,
-        }));
-        const groupedSections = updatedSections.reduce((acc, section) => {
-          if (!acc[section.type]) {
-            acc[section.type] = [];
-          }
-          acc[section.type].push(section);
-          return acc;
-        }, initialSections);
-
-        // Order the sections in a generally expected way
-        const orderedSectionTypes = [
-          'profile',
-          'experiences',
-          'education',
-          'certifications',
-          'projects',
-          'interests',
-          'languages',
-          'affiliations',
-          'awards',
-          'publications',
-          'conferences'
-        ];
-
-        const orderedSections = orderedSectionTypes.reduce((acc, type) => {
-          acc[type] = groupedSections[type] || [];
-          return acc;
-        }, {} as Record<string, Section[]>);
-
-        setSections(orderedSections);
-        
-        // Set initial draft content if there are sections
-        const firstType = Object.keys(orderedSections)[0];
-        if (firstType && orderedSections[firstType].length > 0) {
-          setDraftContent(orderedSections[firstType][0].content);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchSections();
-  }, [id]);
-
-  const goToIndex = (idx: number) => {
-    setCurrentIndex(idx);
-    const sectionType = Object.keys(sections)[idx];
-    setDraftContent(sections[sectionType][0].content);
+  const handlePrevious = () => currentIndex > 0 && setCurrentIndex(currentIndex - 1);
+  const handleNext = () => {
+    if (!sections) return;
+    currentIndex < Object.keys(sections).length - 1
+      ? setCurrentIndex(currentIndex + 1)
+      : router.push(`/resume/${id}/review`);
   };
 
-  const handlePrevious = () => currentIndex > 0 && goToIndex(currentIndex - 1);
-  const handleNext = () =>
-    currentIndex < Object.keys(sections).length - 1
-      ? goToIndex(currentIndex + 1)
-      : router.push(`/resume/${id}/review`);
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
@@ -202,7 +121,7 @@ export default function ResumeSectionEditor() {
     );
   }
 
-  if (!Object.keys(sections).length) {
+  if (!sections) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-gray-600">No sections found.</p>
@@ -210,11 +129,12 @@ export default function ResumeSectionEditor() {
     );
   }
 
-  const sectionTypes = Object.keys(sections).filter(type => sections[type].length > 0);
+  if (!sections) return null;
+  const sectionTypes = (Object.keys(sections) as Array<keyof ResumeData>).filter(type => sections[type].length > 0);
   const currentSectionType = sectionTypes[currentIndex];
   const current = sections[currentSectionType] || [];
-  const CurrentSectionComponent = current.length > 0 
-    ? sectionComponents[current[0].type.toLowerCase() as keyof typeof sectionComponents]
+  const CurrentSectionComponent = current.length > 0
+    ? sectionComponents[currentSectionType.toLowerCase() as keyof typeof sectionComponents]
     : null;
 
   return (
@@ -225,7 +145,7 @@ export default function ResumeSectionEditor() {
             {sectionTypes.map((type, idx) => (
               <button
                 key={type}
-                onClick={() => goToIndex(idx)}
+                onClick={() => setCurrentIndex(idx)}
                 className={`
                   whitespace-nowrap
                   px-4 py-2
