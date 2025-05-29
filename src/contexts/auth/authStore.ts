@@ -9,14 +9,14 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   login: (credentials: LoginCredentials) => Promise<void>;
-  signup: (credentials: SignupCredentials) => Promise<void>;
+  signup: (credentials: SignupCredentials, onSuccess?: () => void) => Promise<void>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  loading: true,
+  loading: false,
   error: null,
 
   setUser: (user) => set({ user }),
@@ -33,10 +33,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         throw new Error(error || 'Failed to fetch session');
       }
 
-      set({ user: data.user });
+      // Only set user if they have confirmed their email
+      if (data.user?.email_confirmed_at) {
+        set({ user: data.user });
+      } else {
+        set({ user: null });
+      }
     } catch (err) {
       console.error('Session check error:', err);
       set({ error: err instanceof Error ? err.message : 'Failed to check session' });
+      set({ user: null });
     } finally {
       set({ loading: false });
     }
@@ -72,7 +78,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  signup: async (credentials) => {
+  signup: async (credentials, onSuccess) => {
     try {
       set({ loading: true, error: null });
 
@@ -88,7 +94,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         throw new Error(data.error || 'Signup failed');
       }
 
-      set({ user: data.user! });
+      // Clear any existing session
+      await fetch('/api/auth/logout', { method: 'POST' });
+      
+      // Call the success callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Signup failed' });
       throw err;

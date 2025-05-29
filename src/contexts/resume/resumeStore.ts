@@ -684,15 +684,14 @@ export const useResumeStore = create<ResumeState>((set, get) => ({
         const currentResume = resumeData[currentResumeId];
 
         try {
-            set({ loading: true, error: null });
-            const response = await fetch('/api/resume', {
-                method: 'POST',
+            // set({ loading: true, error: null });
+            const response = await fetch(`/api/resume/${currentResumeId}`, {
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(currentResume),
             });
 
             const data = await response.json();
-
             if (!data.success) {
                 throw new Error(data.error || 'Failed to save resume');
             }

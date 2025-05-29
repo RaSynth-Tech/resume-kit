@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from './authStore';
 
 // List of public routes that don't require authentication
-const publicRoutes = ['/login', '/signup', '/auth/callback'];
+const publicRoutes = ['/login', '/signup', '/auth/callback', '/confirm-email'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { user, loading, checkSession } = useAuthStore();

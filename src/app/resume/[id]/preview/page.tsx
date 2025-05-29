@@ -12,7 +12,7 @@ export default function ResumePreviewPage() {
   const params = useParams();
   const router = useRouter();
   const { toPDF, targetRef } = usePDF({filename: 'resume.pdf'});
-  const { resumeData, loading: isLoading, error, fetchResume, updateProfile } = useResumeStore();
+  const { resumeData, loading: isLoading, error, fetchResume, updateProfile, saveResume } = useResumeStore();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -50,29 +50,7 @@ export default function ResumePreviewPage() {
     try {
       setIsSaving(true);
       setSaveMessage(null);
-
-      if (!resumeData[id].profile[0]?.id) {
-        throw new Error('Profile ID is missing');
-      }
-
-      const response = await fetch('/api/resume/sections', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'profile',
-          content: {
-            ...resumeData[id].profile[0],
-            tailoring_id: id
-          }
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save changes');
-      }
-
+      await saveResume();
       setSaveMessage('Changes saved successfully');
     } catch (error) {
       setSaveMessage(error instanceof Error ? error.message : 'Failed to save changes');

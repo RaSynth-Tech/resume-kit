@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { Database } from '@/types/supabase';
 
+type TableName = keyof Database['public']['Tables'];
+
 export async function GET(
     request: Request,
     { params }: { params: { tailoringId: string } }
@@ -20,7 +22,6 @@ export async function GET(
         }
 
         // Fetch data from each table
-        type TableName = 'affiliations'| 'skills' | 'awards' | 'certifications' | 'conferences' | 'education' | 'experiences' | 'interests' | 'languages' | 'projects' | 'publications' | 'resume_profiles';
         const tables: TableName[] = ['affiliations', 'skills', 'awards', 'certifications', 'conferences', 'education', 'experiences', 'interests', 'languages', 'projects', 'publications', 'resume_profiles'];
         const sections = [];
 
@@ -66,29 +67,42 @@ export async function PATCH(
             );
         }
 
-        const body = await request.json();
-        const { type, content } = body;
-
-        if (!type || !content) {
+        const resumeData = await request.json();
+        if (!resumeData) {
             return NextResponse.json(
-                { success: false, error: 'Missing required fields' },
+                { success: false, error: 'Missing resume data' },
                 { status: 400 }
             );
         }
 
-        // Update the section in the database
-        const { error: updateError } = await supabase
-            .from('resume_profiles')
-            .update(content)
-            .eq('tailoring_id', params.tailoringId)
-            .eq('id', content.id);
+        // Update each section in the database
+        for (const [type, items] of Object.entries(resumeData)) {
+            // Handle both single items and arrays
+            const itemsToUpdate = Array.isArray(items) ? items : [items];
+            
+            for (const item of itemsToUpdate) {
+                if (!item.id) continue;
 
-        if (updateError) {
-            console.error('Update error:', updateError);
-            return NextResponse.json(
-                { success: false, error: 'Failed to update section' },
-                { status: 500 }
-            );
+                // Remove section_title and create a clean item for update
+                const { section_title, ...cleanItem } = item;
+                const tableName = section_title as TableName;
+
+                if (!tableName) continue;
+
+                const { error: updateError } = await supabase
+                    .from(tableName)
+                    .update(cleanItem)
+                    .eq('tailoring_id', params.tailoringId)
+                    .eq('id', item.id);
+
+                if (updateError) {
+                    console.error(`Update error for ${type}:`, updateError);
+                    return NextResponse.json(
+                        { success: false, error: `Failed to update ${type}` },
+                        { status: 500 }
+                    );
+                }
+            }
         }
 
         return NextResponse.json({ success: true });

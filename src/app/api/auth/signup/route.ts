@@ -32,16 +32,21 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
+    console.log("Signing up with email:", email, "and password:", password);
     const supabase = getSupabaseServerClient();
-    const { data, error } = await supabase.auth.admin.createUser({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      email_confirm: true,
-      user_metadata: { name }
+      options: {
+        data: { name },
+      }
     });
-
+    console.log("Signup data:", data);
     if (error) throw error;
+
+    if (!data.user) {
+      throw new Error('User creation succeeded but no user data returned');
+    }
 
     // Create user profile
     const { error: profileError } = await supabase
@@ -56,7 +61,18 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       console.error('Profile creation error:', profileError);
-      // Don't throw here, as the user is already created in auth
+      // Return a success response even if profile creation fails
+      // The user can update their profile later
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: data.user.id,
+          email: data.user.email!,
+          name,
+          created_at: data.user.created_at,
+        },
+        warning: 'User created but profile setup incomplete. Please try updating your profile later.'
+      });
     }
 
     const response: AuthResponse = {
