@@ -1,23 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/lib/auth/AuthContext';
+import { useAuthStore } from '@/contexts/auth/authStore';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function SignupForm() {
-  const { signup, loading, error } = useAuth();
+  const { signup, loading, error } = useAuthStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: '',
   });
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signup(formData);
+      console.log("Signup form submission started");
+      await signup(formData, () => {
+        console.log("Signup successful, status:");
+        const currentAuthStatus = useAuthStore.getState().authStatus;
+        if (currentAuthStatus === 'authenticated') {
+          router.push('/dashboard');
+        } else {
+          console.log("Signup successful, but status is not 'authenticated':", currentAuthStatus);
+        }
+      });
     } catch (err) {
-      // Error is handled by the context
+      console.error("Signup form submission error:", err);
     }
   };
 

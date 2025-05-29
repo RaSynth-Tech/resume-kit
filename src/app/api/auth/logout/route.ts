@@ -6,13 +6,19 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseServerClient();
     const { error } = await supabase.auth.signOut();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase signout error:', error);
+      return NextResponse.json(
+        { success: false, error: `Failed to logout from Supabase: ${error.message}` },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Logout error:', error);
+    return NextResponse.json({ success: true, message: 'Logout successful' });
+  } catch (error: any) {
+    console.error('Generic logout error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to logout' },
+      { success: false, error: error.message || 'An unexpected error occurred during logout' },
       { status: 500 }
     );
   }

@@ -3,39 +3,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ResumeView } from '@/components/resume/ResumeDocument';
-import { ResumeData, Profile, Experience, Education, Certification, Project } from '@/types/resume';
 import { usePDF } from 'react-to-pdf';
 import { FaArrowLeft, FaDownload, FaEdit, FaSave } from 'react-icons/fa';
-
-interface Section {
-  id: string;
-  type: string;
-  content: string;
-  sort_index: number;
-}
-
-interface ApiResponse {
-  resume_profiles: Profile[];
-  experiences: Experience[];
-  education: Education[];
-  certifications: Certification[];
-  projects: Project[];
-  [key: string]: any[];
-}
+import { useResumeStore } from '@/contexts/resume/resumeStore';
+import { ResumeData } from '@/types/resume';
 
 export default function ResumePreviewPage() {
   const params = useParams();
   const router = useRouter();
   const { toPDF, targetRef } = usePDF({filename: 'resume.pdf'});
-  const [sections, setSections] = useState<ResumeData>({
-    profile: [],
-    experiences: [],
-    education: [],
-    certifications: [],
-    projects: []
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { resumeData, loading: isLoading, error, fetchResume, updateProfile, saveResume } = useResumeStore();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -43,94 +20,42 @@ export default function ResumePreviewPage() {
   const id = params?.id as string;
 
   useEffect(() => {
-    const fetchSections = async () => {
-      if (!id) return;
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/resume/${id}/sections`);
-        if (!res.ok) throw new Error('Failed to fetch sections');
-        const data: ApiResponse = await res.json();
-        console.log('API Response:', data);
-
-        // Transform the data into ResumeData format
-        const resumeData: ResumeData = {
-          profile: data.resume_profiles || [],
-          experiences: data.experiences || [],
-          education: data.education || [],
-          certifications: data.certifications || [],
-          projects: data.projects || []
-        };
-
-        console.log('Parsed Resume Data:', resumeData);
-        setSections(resumeData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        setIsLoading(false);
+    if (id) {
+      if (!resumeData?.[id]) {
+        fetchResume(id);
       }
-    };
-    fetchSections();
-  }, [id]);
+    }
+  }, [id, fetchResume, resumeData]);
 
   const handleEdit = async (field: string, value: any) => {
+    if (!resumeData || !id) return;
+
     try {
-      const updatedSections = { ...sections };
       if (field.startsWith('profile.')) {
         const profileField = field.split('.')[1];
-        updatedSections.profile[0] = {
-          ...updatedSections.profile[0],
+        const updatedProfile = {
+          ...resumeData[id].profile[0],
           [profileField]: value
         };
+        updateProfile(updatedProfile);
       }
-      setSections(updatedSections);
     } catch (error) {
       console.error('Error updating sections:', error);
     }
   };
 
   const handleSave = async () => {
+    if (!resumeData || !id) return;
+
     try {
       setIsSaving(true);
       setSaveMessage(null);
-
-      if (!sections.profile[0]?.id) {
-        throw new Error('Profile ID is missing');
-      }
-
-      const response = await fetch(`/api/resume/${id}/sections`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'profile',
-          content: {
-            ...sections.profile[0],
-            tailoring_id: id
-          }
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save changes');
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to save changes');
-      }
-
+      await saveResume();
       setSaveMessage('Changes saved successfully');
-      setIsEditing(false);
     } catch (error) {
-      console.error('Error saving changes:', error);
       setSaveMessage(error instanceof Error ? error.message : 'Failed to save changes');
     } finally {
       setIsSaving(false);
-      // Clear save message after 3 seconds
-      setTimeout(() => setSaveMessage(null), 3000);
     }
   };
 
@@ -145,85 +70,71 @@ export default function ResumePreviewPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="bg-red-50 p-6 rounded-lg">
-          <p className="text-red-600">{error}</p>
-        </div>
+        <div className="text-red-500">Error: {error}</div>
       </div>
     );
   }
 
-  if (!Object.keys(sections).length) {
+  if (!resumeData || !Object.keys(resumeData).length) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
-        <p className="text-gray-600">No sections found.</p>
+        <div className="text-gray-500">No resume data found</div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto py-8 px-4">
+        <div className="flex justify-between items-center mb-8">
           <button
-            onClick={() => router.push(`/resume/${id}`)}
-            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-            title="Go Back"
+            onClick={() => router.back()}
+            className="flex items-center text-gray-600 hover:text-gray-900"
           >
-            <FaArrowLeft className="w-5 h-5" />
+            <FaArrowLeft className="mr-2" />
+            Back
           </button>
-          <div className="flex items-center gap-4">
-            {saveMessage && (
-              <span className={`text-sm ${saveMessage.includes('Failed') ? 'text-red-600' : 'text-green-600'}`}>
-                {saveMessage}
-              </span>
-            )}
-            {isEditing ? (
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className={`p-2 transition-colors ${
-                  isSaving 
-                    ? 'text-gray-400 cursor-not-allowed' 
-                    : 'text-green-600 hover:text-green-700'
-                }`}
-                title="Save Changes"
-              >
-                <FaSave className="w-5 h-5" />
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-                title="Edit Resume"
-              >
-                <FaEdit className="w-5 h-5" />
-              </button>
-            )}
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              <FaEdit className="mr-2" />
+              {isEditing ? 'Preview' : 'Edit'}
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              <FaSave className="mr-2" />
+              {isSaving ? 'Saving...' : 'Save'}
+            </button>
             <button
               onClick={() => toPDF()}
-              className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-              title="Download PDF"
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
             >
-              <FaDownload className="w-5 h-5" />
+              <FaDownload className="mr-2" />
+              Download PDF
             </button>
           </div>
         </div>
-      </div>
-      
-      <div className="pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="bg-white">
-              <ResumeView 
-                ref={targetRef} 
-                data={sections} 
-                isEditing={isEditing}
-                onEdit={handleEdit}
-              />
-            </div>
+
+        {saveMessage && (
+          <div className={`mb-4 p-4 rounded-md ${saveMessage.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            {saveMessage}
           </div>
+        )}
+
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <ResumeView 
+            ref={targetRef} 
+            data={resumeData[id]} 
+            isEditing={isEditing}
+            onEdit={handleEdit}
+          />
         </div>
       </div>
-    </main>
+    </div>
   );
 } 
