@@ -67,7 +67,18 @@ export default function ResumeSectionEditor() {
 
   const id = params?.id as string;
 
+  // Validate ID
+  useEffect(() => {
+    if (!id) {
+      setError('Invalid resume ID');
+      setIsLoading(false);
+      return;
+    }
+  }, [id]);
+
   const handleSectionChange = (fieldOrIndex: string | number, valueOrField?: any, value?: any) => {
+    if (!fieldOrIndex) return;
+
     setSections(prevSections => {
       const updatedSections = { ...prevSections };
       const currentSectionType = Object.keys(prevSections)[currentIndex];
@@ -80,6 +91,11 @@ export default function ResumeSectionEditor() {
       const field = typeof fieldOrIndex === 'number' ? valueOrField : fieldOrIndex;
       const newValue = typeof fieldOrIndex === 'number' ? value : valueOrField;
       const index = typeof fieldOrIndex === 'number' ? fieldOrIndex : 0;
+
+      // Validate index
+      if (index < 0 || index >= updatedSections[currentSectionType].length) {
+        return prevSections;
+      }
 
       // Update the specific section at the given index
       const updatedSectionArray = [...updatedSections[currentSectionType]];
@@ -100,7 +116,9 @@ export default function ResumeSectionEditor() {
       setError(null);
       try {
         const res = await fetch(`/api/resume/${id}/sections`);
-        if (!res.ok) throw new Error('Failed to fetch sections');
+        if (!res.ok) {
+          throw new Error(`Failed to fetch sections: ${res.statusText}`);
+        }
         const data: ApiResponse = await res.json();
 
         // Initialize with empty arrays for all section types
@@ -118,17 +136,28 @@ export default function ResumeSectionEditor() {
           conferences: []
         };
 
-        // Flatten the sections into a single array
-        const flattenedSections: Section[] = Object.entries(data).flatMap(([type, sections]) =>
-          sections.map(section => ({ ...section, type }))
-        );
+        // Validate and process the data
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid data format received from server');
+        }
 
-        // Group sections by type
+        // Flatten the sections into a single array with validation
+        const flattenedSections: Section[] = Object.entries(data).flatMap(([type, sections]) => {
+          if (!Array.isArray(sections)) return [];
+          return sections.map(section => {
+            if (!section || typeof section !== 'object') return null;
+            return { ...section, type };
+          }).filter(Boolean) as Section[];
+        });
+
+        // Group sections by type with validation
         const updatedSections = flattenedSections.map(section => ({
           ...section,
           type: section.type === 'resume_profiles' ? 'profile' : section.type,
         }));
+
         const groupedSections = updatedSections.reduce((acc, section) => {
+          if (!section || !section.type) return acc;
           if (!acc[section.type]) {
             acc[section.type] = [];
           }
@@ -160,11 +189,11 @@ export default function ResumeSectionEditor() {
         
         // Set initial draft content if there are sections
         const firstType = Object.keys(orderedSections)[0];
-        if (firstType && orderedSections[firstType].length > 0) {
-          setDraftContent(orderedSections[firstType][0].content);
+        if (firstType && orderedSections[firstType]?.length > 0) {
+          setDraftContent(orderedSections[firstType][0]?.content || '');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       } finally {
         setIsLoading(false);
       }
@@ -173,16 +202,27 @@ export default function ResumeSectionEditor() {
   }, [id]);
 
   const goToIndex = (idx: number) => {
+    if (idx < 0 || idx >= Object.keys(sections).length) return;
     setCurrentIndex(idx);
     const sectionType = Object.keys(sections)[idx];
-    setDraftContent(sections[sectionType][0].content);
+    if (sections[sectionType]?.[0]?.content) {
+      setDraftContent(sections[sectionType][0].content);
+    }
   };
 
-  const handlePrevious = () => currentIndex > 0 && goToIndex(currentIndex - 1);
-  const handleNext = () =>
-    currentIndex < Object.keys(sections).length - 1
-      ? goToIndex(currentIndex + 1)
-      : router.push(`/resume/${id}/review`);
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      goToIndex(currentIndex - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < Object.keys(sections).length - 1) {
+      goToIndex(currentIndex + 1);
+    } else {
+      router.push(`/resume/${id}/review`);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -210,11 +250,11 @@ export default function ResumeSectionEditor() {
     );
   }
 
-  const sectionTypes = Object.keys(sections).filter(type => sections[type].length > 0);
+  const sectionTypes = Object.keys(sections).filter(type => sections[type]?.length > 0);
   const currentSectionType = sectionTypes[currentIndex];
   const current = sections[currentSectionType] || [];
   const CurrentSectionComponent = current.length > 0 
-    ? sectionComponents[current[0].type.toLowerCase() as keyof typeof sectionComponents]
+    ? sectionComponents[current[0]?.type?.toLowerCase() as keyof typeof sectionComponents]
     : null;
 
   return (
