@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/contexts/auth/authStore';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
   const { login, loading, error } = useAuthStore();
@@ -11,10 +12,17 @@ export default function LoginForm() {
     password: '',
   });
 
+  const router = useRouter();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login(formData);
+      const currentAuthStatus = useAuthStore.getState().authStatus;
+      if (currentAuthStatus === 'authenticated') {
+        router.push('/dashboard');
+      } else {
+        console.log("Login successful, but status is not 'authenticated':", currentAuthStatus);
+      }
     } catch (err) {
       // Error is handled by the context
     }

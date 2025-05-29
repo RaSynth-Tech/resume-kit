@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from './authStore';
 
 // List of public routes that don't require authentication
-const publicRoutes = ['/login', '/signup', '/auth/callback', '/confirm-email'];
+const publicRoutes = ['/login', '/signup', '/auth/callback', '/confirm-email','/'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { user, loading, checkSession } = useAuthStore();
@@ -18,22 +18,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (hasAuthCookie) {
       checkSession();
     } else {
+      console.log(pathname);
       if (!publicRoutes.includes(pathname)) {
         router.push('/login');
       }
     }
-  }, [pathname, checkSession, router]);
+  }, [pathname, router]);
 
   // Handle route protection
-  useEffect(() => {
-    if (!loading) {
-      if (!user && !publicRoutes.includes(pathname)) {
-        router.push('/login');
-      } else if (user && publicRoutes.includes(pathname)) {
-        router.push('/tailor');
-      }
-    }
-  }, [user, loading, pathname, router]);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     if (!user && !publicRoutes.includes(pathname)) {
+  //       router.push('/login');
+  //     } else if (user && publicRoutes.includes(pathname)) {
+  //       router.push('/tailor');
+  //     }
+  //   }
+  // }, [user, loading, pathname, router]);
 
   return <>{children}</>;
 } 
