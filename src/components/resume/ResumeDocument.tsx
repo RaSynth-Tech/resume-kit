@@ -26,50 +26,53 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
   return (
     <>
       <div ref={ref}
-        className="resume-container mx-auto"
+        className="resume-container mx-auto bg-[#232336] text-gray-100"
         style={{ 
           fontFamily: 'Trebuchet MS', 
           fontSize: '28px', 
           padding: '10px 48px', 
           margin: '32px auto',
-          border: '1px solid #e5e7eb',
-          backgroundColor: 'white',
+          border: '1px solid #232336',
+          backgroundColor: '#232336',
+          color: '#f3f4f6',
           width: '8.3in',
           minHeight: '11.7in',
           boxSizing: 'border-box',
           pageBreakAfter: 'always',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.5), 0 2px 4px -1px rgba(0,0,0,0.4)'
         }}
       >
         {/* ---------- Header ---------- */}
-        <header className="border-b border-gray-200 pb-6 text-center">
-          <h1 className="text-xl font-semibold tracking-wide text-[22px] text-gray-900">
+        <header className="border-b border-gray-700 pb-6 text-center">
+          <h1 className="text-xl font-semibold tracking-wide text-[22px] text-orange-400">
             {isEditing ? (
               <input
                 type="text"
                 value={p?.full_name || ''}
                 onChange={(e) => handleEdit('full_name', e.target.value)}
-                className="text-center w-full border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-2"
+                className="text-center w-full border border-gray-700 bg-[#181828] text-gray-100 placeholder-gray-400 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-2"
+                placeholder="Full Name"
               />
             ) : (
-              p?.full_name || ''
+              <span className="text-gray-100">{p?.full_name || ''}</span>
             )}
           </h1>
-          <h2 className="text-lg font-medium text-gray-600 text-[16px] mt-2">
+          <h2 className="text-lg font-medium text-purple-300 text-[16px] mt-2">
             {isEditing ? (
               <input
                 type="text"
                 value={p?.job_title || ''}
                 onChange={(e) => handleEdit('job_title', e.target.value)}
-                className="text-center w-full border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-2"
+                className="text-center w-full border border-gray-700 bg-[#181828] text-gray-100 placeholder-gray-400 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-2"
+                placeholder="Job Title"
               />
             ) : (
-              p?.job_title || ''
+              <span className="text-gray-100">{p?.job_title || ''}</span>
             )}
           </h2>
 
           {/* Contact Info */}
-          <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[16px] text-gray-600">
+          <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[16px] text-gray-400">
             {p?.email && <span className="text-gray-400">•</span>}
             {p?.email && (
               isEditing ? (
@@ -77,7 +80,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
                   type="email"
                   value={p?.email || ''}
                   onChange={(e) => handleEdit('email', e.target.value)}
-                  className="border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-1"
+                  className="border border-gray-700 bg-[#181828] text-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-1"
                 />
               ) : (
                 <span>{p?.email}</span>
@@ -90,7 +93,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
                   type="tel"
                   value={p?.phone || ''}
                   onChange={(e) => handleEdit('phone', e.target.value)}
-                  className="border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-1"
+                  className="border border-gray-700 bg-[#181828] text-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-1"
                 />
               ) : (
                 <span>{p?.phone}</span>
@@ -103,7 +106,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
                   type="text"
                   value={p?.location || ''}
                   onChange={(e) => handleEdit('location', e.target.value)}
-                  className="border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-1"
+                  className="border border-gray-700 bg-[#181828] text-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-1"
                 />
               ) : (
                 <span>{p?.location}</span>
@@ -112,7 +115,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
           </div>
 
           {/* Links */}
-          <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-gray-600">
+          <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-purple-300">
             {p?.linkedin_url && <span className="text-gray-400">•</span>}
             {p?.linkedin_url && (
               isEditing ? (
@@ -120,10 +123,10 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
                   type="url"
                   value={p?.linkedin_url || ''}
                   onChange={(e) => handleEdit('linkedin_url', e.target.value)}
-                  className="border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-1"
+                  className="border border-gray-700 bg-[#181828] text-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-1"
                 />
               ) : (
-                <a href={p?.linkedin_url} className="hover:text-gray-900 transition-colors duration-200">{p?.linkedin_url}</a>
+                <a href={p?.linkedin_url} className="hover:text-orange-400 transition-colors duration-200 text-purple-300">{p?.linkedin_url}</a>
               )
             )}
             {p?.linkedin_url && p?.github_url && <span className="text-gray-400">•</span>}
@@ -133,10 +136,10 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
                   type="url"
                   value={p?.github_url || ''}
                   onChange={(e) => handleEdit('github_url', e.target.value)}
-                  className="border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-1"
+                  className="border border-gray-700 bg-[#181828] text-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-1"
                 />
               ) : (
-                <a href={p?.github_url} className="hover:text-gray-900 transition-colors duration-200">{p?.github_url}</a>
+                <a href={p?.github_url} className="hover:text-orange-400 transition-colors duration-200 text-purple-300">{p?.github_url}</a>
               )
             )}
             {p?.github_url && p?.website_url && <span className="text-gray-400">•</span>}
@@ -146,10 +149,10 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
                   type="url"
                   value={p?.website_url || ''}
                   onChange={(e) => handleEdit('website_url', e.target.value)}
-                  className="border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none px-3 py-1"
+                  className="border border-gray-700 bg-[#181828] text-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none px-3 py-1"
                 />
               ) : (
-                <a href={p?.website_url} className="hover:text-gray-900 transition-colors duration-200">{p?.website_url}</a>
+                <a href={p?.website_url} className="hover:text-orange-400 transition-colors duration-200 text-purple-300">{p?.website_url}</a>
               )
             )}
           </div>
@@ -163,11 +166,12 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
               <textarea
                 value={p?.about_me || ''}
                 onChange={(e) => handleEdit('about_me', e.target.value)}
-                className="w-full text-[12px] mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-gray-500 focus:border-gray-500 focus:outline-none p-2"
+                className="w-full text-[12px] mt-1 border border-gray-700 bg-[#181828] text-gray-100 placeholder-gray-400 rounded-md shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none p-2"
                 rows={4}
+                placeholder="Summary/About Me"
               />
             ) : (
-              <p className="text-[12px] mt-1">{p?.about_me}</p>
+              <p className="text-[12px] mt-1 text-gray-100">{p?.about_me}</p>
             )}
           </section>
         )}
@@ -261,7 +265,7 @@ export const ResumeView = React.forwardRef<HTMLDivElement, ResumeViewProps>(({ d
 /* ---------- tiny helpers ---------- */
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="border-b border-gray-200 pb-2 text-[14px] font-semibold uppercase tracking-widest text-gray-500">
+    <h3 className="border-b border-gray-700 pb-2 text-[14px] font-semibold uppercase tracking-widest text-gray-400">
       {children}
     </h3>
   );

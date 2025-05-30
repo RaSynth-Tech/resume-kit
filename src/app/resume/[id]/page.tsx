@@ -19,17 +19,6 @@ import ResumePreview from '@/components/resume/ResumePreview';
 import { useResumeStore } from '@/contexts/resume/resumeStore';
 import { ResumeData } from '@/types/resume';
 
-interface Section {
-  id: string;
-  type: string;
-  content: string;
-  sort_index: number;
-}
-
-interface ApiResponse {
-  [key: string]: Section[];
-}
-
 // Mapping section types to components
 const sectionComponents = {
   experiences: ExperienceSection,
@@ -49,22 +38,22 @@ const sectionComponents = {
 export default function ResumeSectionEditor() {
   const router = useRouter();
   const params = useParams();
-  const [sections, setSections] = useState<ResumeData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [draftContent, setDraftContent] = useState('');
 
   const id = params?.id as string;
   const { resumeData, updateProfile, updateExperience, updateEducation, updateCertification, updateProject, fetchResume, loading } = useResumeStore();
 
-  // Validate ID
+  // Validate ID and fetch data
   useEffect(() => {
     if (!id) {
       setError('Invalid resume ID');
-      setIsLoading(false);
       return;
     }
-  }, [id]);
+    if (!resumeData?.[id]) {
+      fetchResume(id);
+    }
+  }, [id, fetchResume, resumeData]);
 
   const handleSectionChange = (fieldOrIndex: string | number, valueOrField?: any, value?: any) => {
     if (!resumeData || !id) return;
@@ -105,16 +94,9 @@ export default function ResumeSectionEditor() {
     }
   };
 
-  useEffect(() => {
-    if (id) {
-      if (!resumeData?.[id]) {
-        fetchResume(id);
-      }
-    }
-  }, [id, fetchResume, resumeData]);
-
   const goToIndex = (idx: number) => {
-    if (idx < 0 || idx >= Object.keys(resumeData?.[id] || {}).length) return;
+    if (!resumeData?.[id]) return;
+    if (idx < 0 || idx >= Object.keys(resumeData[id]).length) return;
     setCurrentIndex(idx);
   };
 
@@ -125,8 +107,11 @@ export default function ResumeSectionEditor() {
   };
 
   const handleNext = () => {
-    if (currentIndex < Object.keys(resumeData?.[id] || {}).length - 1) {
+    if (!resumeData?.[id]) return;
+    if (currentIndex < Object.keys(resumeData[id]).length - 1) {
       goToIndex(currentIndex + 1);
+    } else {
+      router.push(`/resume/${id}/preview`);
     }
   };
 
@@ -148,24 +133,23 @@ export default function ResumeSectionEditor() {
     );
   }
 
-  if (!sections) {
+  if (!resumeData?.[id]) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-600">No sections found.</p>
+        <p className="text-gray-600">No resume data found.</p>
       </div>
     );
   }
 
-  if (!sections) return null;
-  const sectionTypes = (Object.keys(sections) as Array<keyof ResumeData>).filter(type => sections[type].length > 0);
+  const sectionTypes = Object.keys(resumeData[id]).filter(type => resumeData[id][type].length > 0);
   const currentSectionType = sectionTypes[currentIndex];
-  const current = sections[currentSectionType] || [];
+  const current = resumeData[id][currentSectionType] || [];
   const CurrentSectionComponent = current.length > 0
     ? sectionComponents[currentSectionType.toLowerCase() as keyof typeof sectionComponents]
     : null;
 
   return (
-    <main className="min-h-screen bg-gray-50 py-12">
+    <main className="min-h-screen bg-[#181828] py-12">
       <div className="max-w-7xl mx-auto px-4">
         {sectionTypes.length > 0 && (
           <div className="flex justify-center space-x-3 overflow-x-auto mb-8">
@@ -180,8 +164,8 @@ export default function ResumeSectionEditor() {
                   text-sm font-medium
                   transition-all duration-150
                   ${idx === currentIndex
-                    ? 'bg-white text-gray-900 border border-gray-300 shadow-sm'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}
+                    ? 'btn-primary bg-gradient-to-r from-orange-500 to-purple-700 text-white border-orange-500 shadow-sm'
+                    : 'bg-[#232336] text-gray-100 border border-gray-700 hover:bg-[#2d2d44]'}
                 `}
               >
                 {type.toUpperCase()}
@@ -191,7 +175,7 @@ export default function ResumeSectionEditor() {
         )}
 
         <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex-1 bg-white rounded-2xl shadow-xl p-8">
+          <div className="flex-1 bg-[#232336] rounded-2xl shadow-xl p-8 text-gray-100">
             {CurrentSectionComponent && current.length > 0 && (
               <CurrentSectionComponent
                 data={current as any}
@@ -204,26 +188,26 @@ export default function ResumeSectionEditor() {
                 onClick={handlePrevious}
                 disabled={currentIndex === 0}
                 className={`
-                  inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md
+                  inline-flex items-center px-4 py-2 border border-gray-700 shadow-sm text-sm font-medium rounded-md
                   transition-colors duration-200
                   ${currentIndex === 0
-                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500'}
+                    ? 'bg-[#181828] text-gray-500 cursor-not-allowed'
+                    : 'btn-primary'}
                 `}
               >
                 Previous
               </button>
               <button
                 onClick={handleNext}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
+                className="btn-primary"
               >
-                {currentIndex === sectionTypes.length - 1 ? 'Review' : 'Next'}
+                {currentIndex === sectionTypes.length - 1 ? 'Preview' : 'Next'}
               </button>
             </div>
           </div>
 
           {/* Right Column: Resume Preview */}
-          <ResumePreview sections={sections} />
+          <ResumePreview sections={resumeData[id]} />
         </div>
       </div>
     </main>
