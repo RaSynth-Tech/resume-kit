@@ -9,11 +9,11 @@ type TailoringData = Database['public']['Tables']['tailoring_data']['Row'];
 async function getResumes() {
   const supabase = getSupabaseServerClient();
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
+  console.log("Session data:12", session);
   if (sessionError || !session) {
     redirect('/login');
   }
-
+  console.log("Session data:13", session);
   const { data, error } = await supabase
     .from('tailoring_data')
     .select('*')
@@ -24,7 +24,7 @@ async function getResumes() {
     console.error('Error fetching resumes:', error);
     return [];
   }
-
+  console.log("Session data:14", data);
   return data || [];
 }
 

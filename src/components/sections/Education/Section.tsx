@@ -1,25 +1,56 @@
-import React, { useState } from 'react';
-import { Education } from './types';
+import React, { useState, useEffect } from 'react';
+import { Education } from '@/types/resume';
 import { FaChevronDown, FaChevronUp, FaUniversity, FaGraduationCap, FaCalendarAlt, FaMapMarkerAlt, FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import RichTextEditor from '@/components/common/RichTextEditor';
+import { useResumeStore } from '@/contexts/resume/resumeStore';
 
-interface EducationSectionProps {
-  data: Education[];
-  onChange: (index: number, field: string, value: any) => void;
-}
-
-const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) => {
+const EducationSection: React.FC = () => {
+  const { resumeData, updateEducation, currentResumeId } = useResumeStore();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  const [localEducation, setLocalEducation] = useState<Education[]>([]);
+
+  useEffect(() => {
+    if (currentResumeId && resumeData && resumeData[currentResumeId]?.education) {
+      setLocalEducation(resumeData[currentResumeId].education);
+      console.log(resumeData[currentResumeId].education);
+    } else {
+      setLocalEducation([]);
+    }
+  }, [resumeData, currentResumeId]);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
+  const handleInputChange = (index: number, field: string, value: any) => {
+    setLocalEducation(prev => {
+      const newEducation = [...prev];
+      newEducation[index] = {
+        ...newEducation[index],
+        [field]: value
+      };
+      return newEducation;
+    });
+    
+    // Update the global state
+    const education = localEducation[index];
+    if (education?.id) {
+      updateEducation(education.id, { [field]: value });
+    }
+  };
+
+  if (!localEducation.length) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No education entries added yet. Click the add button to create your first education entry.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {data.map((education, index) => (
+      {localEducation.map((education, index) => (
         <div 
-          key={index} 
+          key={education.id || index} 
           className="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
         >
           {/* Accordion Header */}
@@ -43,7 +74,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onChange(index, 'sort_index', education.sort_index - 1);
+                    handleInputChange(index, 'sort_index', education.sort_index - 1);
                   }}
                   className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -52,7 +83,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onChange(index, 'sort_index', education.sort_index + 1);
+                    handleInputChange(index, 'sort_index', education.sort_index + 1);
                   }}
                   className="p-1.5 text-gray-600 hover:text-[#1e40af] hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -77,7 +108,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
                     <input
                       type="text"
                       value={education.institution}
-                      onChange={(e) => onChange(index, 'institution', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'institution', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                       placeholder="Enter institution name"
                     />
@@ -91,7 +122,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
                     <input
                       type="text"
                       value={education.degree}
-                      onChange={(e) => onChange(index, 'degree', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'degree', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                       placeholder="Enter degree"
                     />
@@ -107,7 +138,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
                     <input
                       type="date"
                       value={education.start_date || ''}
-                      onChange={(e) => onChange(index, 'start_date', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'start_date', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     />
                     <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -120,7 +151,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
                     <input
                       type="date"
                       value={education.end_date || ''}
-                      onChange={(e) => onChange(index, 'end_date', e.target.value)}
+                      onChange={(e) => handleInputChange(index, 'end_date', e.target.value)}
                       className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
                     />
                     <FaCalendarAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -128,43 +159,17 @@ const EducationSection: React.FC<EducationSectionProps> = ({ data, onChange }) =
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Major</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={education.major || ''}
-                      onChange={(e) => onChange(index, 'major', e.target.value)}
-                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
-                      placeholder="Enter major"
-                    />
-                    <FaGraduationCap className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Location</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={education.location || ''}
-                      onChange={(e) => onChange(index, 'location', e.target.value)}
-                      className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
-                      placeholder="Enter location"
-                    />
-                    <FaMapMarkerAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Coursework</label>
+                <label className="block text-sm font-medium text-gray-700">Description</label>
                 <div className="relative">
-                  <RichTextEditor
-                    value={education.coursework?.join('\n') || ''}
-                    onChange={(value) => onChange(index, 'coursework', value.split('\n'))}
+                  <textarea
+                    value={education.description || ''}
+                    onChange={(e) => handleInputChange(index, 'description', e.target.value)}
+                    className="w-full p-2 pl-8 border rounded-md focus:ring-2 focus:ring-[#1e40af] focus:border-[#1e40af] transition-colors"
+                    placeholder="Enter description"
+                    rows={4}
                   />
+                  <FaGraduationCap className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 </div>
               </div>
             </div>

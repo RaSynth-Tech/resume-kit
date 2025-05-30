@@ -1,10 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth/AuthContext';
-
+import { useAuthStore } from '@/contexts/auth/authStore';
+import { useRouter } from 'next/navigation';
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
+  const router = useRouter();
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
 
   return (
     <nav className="bg-white border-b border-gray-200">
@@ -35,7 +40,7 @@ export default function Navbar() {
                     {user.name || user.email}
                   </span>
                   <button
-                    onClick={() => logout()}
+                    onClick={() => handleLogout()}
                     className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200"
                   >
                     Logout

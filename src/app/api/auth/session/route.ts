@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
         name: (profile as UserRow)?.name ?? undefined,
         avatar_url: (profile as UserRow)?.avatar_url ?? undefined,
         created_at: user.created_at,
+        email_confirmed_at: user.email_confirmed_at,
       },
       isAuthenticated: true,
     };
@@ -53,7 +54,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: response });
 
   } catch (err) {
-    console.error('Session fetch error:', err);
     return NextResponse.json(
       { success: false, error: 'Failed to get session' },
       { status: 500 }
