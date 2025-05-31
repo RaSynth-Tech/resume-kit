@@ -27,7 +27,7 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 max-w-xs mx-auto">
+    <div className="bg-[#181828] text-gray-100 rounded-2xl shadow-xl p-4 md:p-8 max-w-xs mx-auto">
       <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Resume Preview</h2>
       <div className="mb-4  flex overflow-hidden flex items-center justify-center align-middle" style={{ maxHeight: '300px' }}>
         <div 
@@ -40,7 +40,7 @@ const ResumePreview: React.FC<any> = ({ sections }) => {
       <div className="flex justify-center">
         <button 
           onClick={handlePreview} 
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-300"
+          className="btn-primary"
         >
           View Full Size
         </button>
